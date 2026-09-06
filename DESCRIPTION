@@ -1,0 +1,44 @@
+Package: RDelta
+Type: Package
+Title: Parse and Query DELTA-Format Taxonomic Descriptions
+Version: 0.1.0
+Date: 2026-09-07  # Update to current date
+Authors@R: c(
+    person("Mauro", "Cavalcanti",
+           email = "maurobio@gmail.com",
+           role = c("aut", "cre"),
+           comment = "Original tDelta C++ library by Denis Ziegler"),
+    person("Edinaldo Nelson", "dos Santos Silva",
+           email = "nelson@inpa.gov.br",
+           role = "ctb")
+  )
+Maintainer: Mauro Cavalcanti <maurobio@gmail.com>
+Description: Provides an R interface to the tDelta C++ library for parsing
+    DELTA (DEscription Language for TAxonomy) format files. Supports loading
+    character lists, item descriptions, and specifications, with efficient
+    searching and matching of items based on character values. It also supports
+    the generation of identification keys, diagnoses, natural-language descriptions,
+    and clustering and ordination analyses by means of the DELTA programs CONFOR, 
+    KEY, and DIST.
+License: GPL (>= 3) + file LICENSE
+URL: https://github.com/maurobio/DeltaR
+BugReports: https://github.com/maurobio/DeltaR/issues
+Depends: R (>= 3.5.0)
+Imports: 
+    Rcpp (>= 1.0.0),
+    graphics,
+    methods,
+    stats,
+    utils,
+    stringr
+LinkingTo: Rcpp
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+SystemRequirements: C++17
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+Config/roxygen2/version: 8.1.0
+

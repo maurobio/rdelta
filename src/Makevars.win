@@ -1,0 +1,4 @@
+PKG_LIBS = 
+CXX_STD = CXX11
+# Or for C++17:
+CXX_STD = CXX17

@@ -1,0 +1,477 @@
+---
+title: "Introduction to RDelta"
+author: "Mauro Cavalcanti <maurobio@gmail.com>"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to RDelta}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5,
+  eval = FALSE
+)
+```
+
+# Introduction
+
+## Overview of the DELTA System
+
+The **DELTA (DEscription Language for TAxonomy)** system is a flexible data format for coding taxonomic descriptions and computer processing, allowing the construction of both conventional and interactive identification keys, diagnoses, natural-language descriptions, as well as data analysis. Developed by Mike Dallwitz and colleagues at CSIRO starting in 1979 (Dallwitz 1980, Dallwitz et al. 1993), it has been a recognized standard of Biodiversity Information Standards (TDWG) since 1986. 
+
+## The DELTA Format
+
+The format is designed to be a flexible and powerful way to capture descriptive data for a wide variety of organisms, from viruses and fungi to several groups of plants and animals. This encoding is versatile enough to be the primary way of recording data, even without immediate plans for computer processing (Pankhurst 1986, Askevold & O'Brien 1994, Colemen et al. 2010).
+
+## The DELTA System and its Programs
+
+The DELTA System is an integrated set of programs built around this format (Dallwitz et al. 1993). These programs allow to generate a variety of outputs from the same coded dataset:
+
+- **Natural-Language Descriptions**: The `CONFOR` program can convert the coded data into high-quality, formatted natural-language descriptions, with control over sentence structure and the inclusion of important attributes. This can be used to generate descriptions for taxonomic monographs and floras automatically.
+
+- **Identification Keys**: The `KEY` program (Dallwitz 1974) generates conventional (printed) identification keys. It can tailor keys for specific purposes by adjusting weights for character reliability and selecting subsets of characters and taxa.
+
+- **Interactive Identification**: The `INTKEY` program (Dallwitz 1993) enables powerful interactive identification and information retrieval, allowing users to identify specimens by entering attributes in any order, handling errors and uncertainty, and directly processing numeric values. It is considered a key feature of the DELTA system.
+
+- **Diagnoses**: The system can generate diagnostic descriptions, which are sets of characters that distinguish a particular taxon from others.
+
+- **Data Analysis**: The system can convert data into formats required for phylogenetic and phenetic analysis programs, and calculate distance matrices for clustering and ordination analysis.
+
+Over time, the DELTA software has been updated, including **Open Delta**, a newer Java-based implementation developed by the Atlas of Living Australia, and **Free Delta**, a Lazarus/Free Pascal implementation developed by The Free Delta Project, both of which runs on MS-Windows, MacOSX, and GNU/Linux.
+
+## The RDelta Library
+
+None of the existing R packages for handling ans processing taxonomic data provide access to DELTA-coded files. The aim of the **RDelta** package is to fill this gap in the R ecosystem by providing a comprehensive set of functions, not only for reading and writing DELTA data, but for generating several products (natural-language descriptions, identification keys, distance matrices) as well.
+
+This vignette documents the test programs and utilities developed for the RDelta package. These programs demonstrate various features of the package and can serve as examples for developers and advanced users.
+
+The following test programs are included:
+
+1. **`test_RDelta.R`** - Interactive test program for RDelta functionality
+2. **`identification.R`** - Simple identification function using RDelta
+
+---
+
+## 1. Interactive Test Program (`test_RDelta.R`)
+
+This program provides an interactive menu-driven interface for testing RDelta package functions. It allows users to:
+
+- Display character lists and retrieve character information
+- Display item lists and retrieve item information
+- Test item/character-value matching
+- Run identification tests
+- Display specifications and full package information
+
+### Source Code
+
+```{r test_RDelta, echo=TRUE, eval=FALSE}
+
+library(RDelta)
+
+#--- Get command line arguments ----------------------------------------------
+# This works in both interactive and non-interactive modes
+get_args <- function() {
+  # Get all command line arguments
+  args <- commandArgs(trailingOnly = TRUE)
+  
+  # If running interactively and no arguments were provided,
+  # prompt the user for file names
+  if (interactive() && length(args) == 0) {
+    cat("\nNo command-line arguments provided.\n")
+    cat("Please enter file names (or press Enter to use defaults):\n\n")
+    
+    chars <- readline(prompt = "Characters file [chars]: ")
+    if (chars == "") chars <- "chars"
+    
+    items <- readline(prompt = "Items file [items]: ")
+    if (items == "") items <- "items"
+    
+    specs <- readline(prompt = "Specifications file [specs] (optional): ")
+    if (specs == "") specs <- NULL
+    
+    return(list(chars = chars, items = items, specs = specs))
+  }
+  
+  # Non-interactive mode or arguments provided
+  if (length(args) >= 2) {
+    chars <- args[1]
+    items <- args[2]
+    specs <- if (length(args) >= 3) args[3] else NULL
+  } else {
+    # Default files
+    chars <- "chars"
+    items <- "items"
+    specs <- "specs"
+  }
+  
+  return(list(chars = chars, items = items, specs = specs))
+}
+
+#--- Get file names ----------------------------------------------------------
+files <- get_args()
+
+chars_file <- files$chars
+items_file <- files$items
+specs_file <- files$specs
+
+#--- Creates CharList, ItemList and Specs objects and parses the
+#    corresponding text files ----------------------------------------------
+if (!is.null(specs_file)) {
+  Example <- load_delta(chars_file, items_file, specs_file)
+} else {
+  Example <- load_delta(chars_file, items_file)
+}
+
+if (!(Example$is_parsed() && Example$is_items_parsed())) {
+  stop("Error parsing characters and/or items description files")
+}
+if (Example$has_specifications() && !Example$is_specs_parsed()) {
+  stop("Error parsing specifications file")
+}
+
+#--- Displays header -------------------------------------------------------
+cat("==================\n")
+cat("Free Delta Project\n")
+cat("==================\n")
+cat("Test of RDelta package\n\n")
+
+stop <- FALSE
+while (!stop) {
+  #--- Menu ----------------------------------------------------------------
+  cat("\n")
+  cat("Test Options:\n")
+  cat("1. Character list\n")
+  cat("2. Retrieve a character\n")
+  cat("3. Item list\n")
+  cat("4. Retrieve an item\n")
+  cat("5. Item/character-value matching\n")
+  cat("6. Identification\n")
+  cat("7. Specifications\n")
+  cat("8. Retrieve all (debugging)\n")
+  cat("9. Exit\n")
+  opt <- readline(prompt = "Your choice: ")
+  opt <- as.integer(opt)
+  
+  if (is.na(opt)) {
+    cat("Invalid input. Please enter a number.\n")
+    next
+  }
+  
+  if (opt == 1) {
+    #----- Displays all characters features -----
+    cat("\nCHARACTERS LIST:\n")
+    for (i in 1:Example$get_chars_nb()) {
+      cat(i, " : ", Example$get_char_feature(i), "\n")
+    }
+    cat("*** ", Example$get_chars_nb(), " characters ***\n")
+    
+  } else if (opt == 2) {
+    #----- Displays information about one character -----
+    num <- readline(prompt = "Enter character number to retrieve: ")
+    num <- as.integer(num)
+    if (is.na(num) || (num < 1) || (num > Example$char_count())) {
+      cat("Invalid character number\n")
+    } else {
+      #--- Character type
+      cat("\nType : ")
+      ct <- Example$get_char_type(num)
+      if (ct == 2) {
+        cat("unordered multistate\n")
+      } else if (ct == 3) {
+        cat("ordered multistate\n")
+      } else if (ct == 4) {
+        cat("integer numeric\n")
+      } else if (ct == 5) {
+        cat("real numeric\n")
+      } else if (ct == 8) {
+        cat("text/comment\n")
+      }
+      
+      #--- Feature
+      cat("Feature : ", Example$get_char_feature(num), "\n")
+      
+      #--- State list or unit
+      if (ct == 2 || ct == 3) {  # CT_UM or CT_OM
+        for (j in 1:Example$get_states_nb(num)) {
+          cat("State ", j, " : ", Example$get_state(num, j), "\n")
+        }
+      } else if (ct == 4 || ct == 5) {  # CT_IN or CT_RN
+        cat("Unit : ", Example$get_char_unit(num), "\n")
+      }
+    }
+    
+  } else if (opt == 3) {
+    #----- Displays all items names -----
+    cat("\nITEMS LIST:\n")
+    for (i in 1:Example$get_items_nb()) {
+      cat(i, " : ", Example$get_item_name(i), "\n")
+    }
+    cat("*** ", Example$get_items_nb(), " items ***\n")
+    
+  } else if (opt == 4) {
+    #----- Displays information about an item -----
+    num <- readline(prompt = "Enter item number to retrieve: ")
+    num <- as.integer(num)
+    if (is.na(num) || (num < 1) || (num > Example$item_count())) {
+      cat("Invalid item number\n")
+    } else {
+      # Name
+      cat("\nItem name :\n")
+      cat("  ", Example$get_item_name(num), "\n")
+      # Attributes
+      cat("Attributes :\n")
+      for (j in 1:Example$get_attributes_nb(num)) {
+        cat("  ", Example$get_attribute(num, j), "\n")
+      }
+    }
+    
+  } else if (opt == 5) {
+    #----- Matching item with character value -----
+    n1 <- readline(prompt = "Enter item number: ")
+    n1 <- as.integer(n1)
+    if (is.na(n1) || (n1 < 1) || (n1 > Example$get_items_nb())) {
+      cat("Invalid item number\n")
+      next
+    }
+    
+    n2 <- readline(prompt = "Enter character number: ")
+    n2 <- as.integer(n2)
+    if (is.na(n2) || (n2 < 1) || (n2 > Example$get_chars_nb())) {
+      cat("Invalid character number\n")
+      next
+    }
+    
+    x1 <- readline(prompt = "Enter character state/value: ")
+    x1 <- as.numeric(x1)
+    
+    if (is.na(x1)) {
+      cat("Invalid value\n")
+      next
+    }
+    
+    # Display item name
+    cat("\nItem ", Example$get_item_name(n1), " is ")
+    
+    # Compare and display result - use matches_default for simple comparison
+    if (!Example$matches_default(n1, n2, x1)) {
+      cat("not ")
+    }
+    cat("matching with\n")
+    
+    # Display character and state/value
+    cat("character : ", Example$get_char_feature(n2), "\n")
+    cat("state/value : ", x1)
+    ct <- Example$get_char_type(n2)
+    if (ct == 2 || ct == 3) {  # CT_UM or CT_OM
+      cat(" ", Example$get_state(n2, as.integer(x1)), "\n")
+    } else if (ct == 4 || ct == 5) {  # CT_IN or CT_RN
+      cat(" ", Example$get_char_unit(n2), "\n")
+    }
+    cat("\n")
+    
+  } else if (opt == 6) {
+    #----- Item identification -----
+    # Check if identification.R exists
+    if (file.exists("identification.R")) {
+      source("identification.R")
+      identification(Example)
+    } else {
+      cat("Error: identification.R file not found\n")
+    }
+    
+  } else if (opt == 7) {
+    #----- Displays specification file content -----
+    if (Example$has_specifications()) {
+      cat("\nSPECIFICATIONS:\n")
+      cat(Example$retrieve_all_specs())
+    } else {
+      cat("No specifications file\n")
+    }
+    
+  } else if (opt == 8) {
+    #----- Displays all information stored after parsing (debugging) -----
+    cat("\n========================================\n")
+    cat("     FULL PACKAGE INFORMATION\n")
+    cat("========================================\n\n")
+    cat(Example$retrieve_all())
+  
+  } else if (opt == 9) {
+    #----- Exit -----
+    stop <- TRUE
+    break
+  }  
+}
+
+cat("\nTest completed.\n")
+```
+
+### Usage Example
+
+```bash
+# Run with default files (chars, items, specs)
+Rscript test_RDelta.R
+
+# Run with custom files
+Rscript test_RDelta.R mychars myitems myspecs
+```
+
+---
+
+## 2. Identification Function (`identification.R`)
+
+This module demonstrates a simplified identification system using RDelta. It allows users to identify taxa by successively comparing observed character values against item descriptions stored in DELTA files.
+
+### Source Code
+
+```{r identification, echo=TRUE, eval=FALSE}
+
+message_identification <- function() {
+  cat("\nIDENTIFICATION\n")
+  cat("This function demonstrates the possibility using RDelta package for taxa\n")
+  cat("identification.\n")
+  cat("In this example, the identification process has been simplified a lot.\n")
+  cat("It is based on successive comparisons between observed characters values,\n")
+  cat("and the items descriptions stored in the Delta files.\n")
+  cat("Advanced features, such as values combinations, implicit values, dependant\n")
+  cat("characters are not implemented. There is no characters selection during\n")
+  cat("identification (like the 'best' command in Intkey).\n")
+  cat("Of course, the user interface is very simple, and should be improved in\n")
+  cat("a public release.\n\n")
+  cat("Usage :\n")
+  cat("To make an identification, you should have a printed version of characters\n")
+  cat("description (Delta chars file).\n")
+  cat("Select a character and a value according to the taxon you want to identify.\n")
+  cat("After each selection, the program displays all characters values already\n")
+  cat("selected, and the list of remaining taxa.\n")
+  cat("To cancel a previous selected character, select it again, and input the\n")
+  cat("UNKNOWN value (-1). You can also modify a previously selected value.\n\n")
+}
+
+identification <- function(delta) {
+  #----- Initialisation -----
+  nbval <- RDelta::get_chars_nb(delta)
+  nbitm <- RDelta::get_items_nb(delta)
+  
+  tabval <- rep(NA, nbval)
+  tabitm <- rep(1, nbitm)
+  
+  message_identification()
+  
+  #----- User input and search matching items -----
+  while (TRUE) {
+    #--- Input character number and value
+    cat("Select a character describing the item to identify :\n")
+    cat("  Enter character number (0=exit) : ")
+    charnum <- as.integer(readline())
+    
+    if (is.na(charnum) || charnum == 0) break
+    
+    if (charnum < 1 || charnum > nbval) {
+      cat("  Invalid character number\n")
+      next
+    }
+    
+    cat("  Enter character state/value (-1=unknown) : ")
+    charval <- as.numeric(readline())
+    
+    if (is.na(charval)) {
+      cat("  Invalid value, please enter a number\n")
+      next
+    }
+    
+    #--- Stores value
+    tabval[charnum] <- if (charval == -1) NA else charval
+    
+    #--- Update items table considering selected values
+    for (i in 1:nbitm) {
+      for (j in 1:nbval) {
+        if (is.na(tabval[j])) {
+          tabitm[i] <- 1
+        } else {
+          tabitm[i] <- as.integer(RDelta::matches(delta, i, j, tabval[j]))
+        }
+        if (tabitm[i] == 0) break
+      }
+    }
+    
+    #--- Displays selected characters and values, and remaining items list
+    cat("\nCHARACTERS SELECTION\n")
+    for (j in 1:nbval) {
+      if (!is.na(tabval[j])) {
+        cat(j, ". ", RDelta::get_char_feature(delta, j), "\n", sep = "")
+        cat("    state/value : ", tabval[j], sep = "")
+        
+        if (RDelta::get_char_type(delta, j) == 2) {
+          cat(" - ", RDelta::get_state(delta, j, as.integer(tabval[j])), "\n", sep = "")
+        } else if (RDelta::get_char_type(delta, j) == 4) {
+          cat(" ", RDelta::get_char_unit(delta, j), "\n", sep = "")
+        } else {
+          cat("\n")
+        }
+      }
+    }
+    
+    cat("ITEMS REMAINING\n")
+    for (i in 1:nbitm) {
+      if (tabitm[i] == 1) {
+        cat(delta$get_item_name(i), "\n")
+      }
+    }
+    cat("\n")
+  }
+}
+
+#==============================================================================
+# Example usage (commented out):
+#
+# library(RDelta)
+# delta <- load_delta("chars_viola", "items_viola")  # read DELTA files
+# identification(delta)
+#==============================================================================
+```
+
+### Usage Example
+
+```r
+library(RDelta)
+delta <- load_delta("chars_viola", "items_viola", "specs_viola")
+source("identification.R")
+identification(delta)
+```
+
+---
+
+
+## Summary of Test Programs
+
+| Program | Purpose | Key Features |
+|---------|---------|--------------|
+| `test_RDelta.R` | Interactive testing | Menu-driven, tests all RDelta functions |
+| `identification.R` | Taxa identification | Simplified identification system |
+
+All programs are designed to work with the RDelta package and demonstrate its capabilities for processing taxonomic descriptions in DELTA format.
+
+---
+
+## References
+
+- Askevold, I. S., & O'Brien, C. W. (1994). DELTA, an invaluable computer program for generation of taxonomic monographs. _Annals of the Entomological Society of America_, 87(1), 1-16.
+
+- Coleman, C. O., Lowry, J. K., & Macfarlane, T. (2010). DELTA for Beginners: an introduction into the taxonomy software package DELTA. _ZooKeys_, 45, 1-75.
+
+- Dallwitz, M. J. (1974). A flexible computer program for generating identification keys. _Systematic Zoology_, 23, 50-57.
+
+- Dallwitz, M. J. (1980). A general system for coding taxonomic descriptions. _Taxon_, 29, 41-46.
+
+- Dallwitz, M. J. (1993). DELTA and INTKEY. In R. Fortuner (Ed.), Advances in Computer Methods for Systematic Biology: Artificial Intelligence, Databases, Computer Vision (pp. 287-296). The Johns Hopkins University Press, Baltimore.
+
+- Dallwitz, M. J.; Paine, T. A., & Zurcher, E. J. (1993). _User's Guide to the DELTA System: a General System for Processing Taxonomic Descriptions_. 4th edition. CSIRO Division of Entomology, Canberra.
+
+- Pankhurst, R. J. (1986). A package of computer programs for handling taxonomic databases. _Computer Applications in the Biosciences_, 2, 33-39.
+
