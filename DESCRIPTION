@@ -21,8 +21,8 @@ Description: Provides an R interface to the tDelta C++ library for parsing
     and clustering and ordination analyses by means of the DELTA programs CONFOR, 
     KEY, and DIST.
 License: GPL (>= 3) + file LICENSE
-URL: https://github.com/maurobio/DeltaR
-BugReports: https://github.com/maurobio/DeltaR/issues
+URL: https://github.com/maurobio/rdelta
+BugReports: https://github.com/maurobio/rdelta/issues
 Depends: R (>= 3.5.0)
 Imports: 
     Rcpp (>= 1.0.0),

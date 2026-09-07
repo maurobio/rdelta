@@ -12,8 +12,8 @@ DELTA (DEscription Language for TAxonomy) format files.
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/maurobio/DeltaR}
-  \item Report bugs at \url{https://github.com/maurobio/DeltaR/issues}
+  \item \url{https://github.com/maurobio/rdelta}
+  \item Report bugs at \url{https://github.com/maurobio/rdelta/issues}
 }
 
 }

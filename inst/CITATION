@@ -9,7 +9,7 @@ bibentry(
   ),
   year = "2026",
   note = "R package version 0.1.0",
-  url = "https://github.com/maurobio/DeltaR",
+  url = "https://github.com/maurobio/rdelta",
   textVersion = paste(
     "Mauro Cavalcanti and Edinaldo Nelson dos Santos Silva (2026).",
     "DeltaR: Parse and Query DELTA-Format Taxonomic Descriptions.",
