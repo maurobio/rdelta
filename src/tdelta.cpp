@@ -555,23 +555,40 @@ int tDeltaItemList::get_attributes_nb(int itemnum) const
 }
 
 //----- Retrieves an item attribute -------------------------------------------
+//string tDeltaItemList::get_attribute(int itemnum, int attrnum) const
+//{
+//  string str;
+//  char ch[8];
+
+// if ((itemnum < 1) || (itemnum > (int)item_list.size())) {
+//    return "";
+//  }
+//  if ((attrnum < 1) || (attrnum > (int)item_list[itemnum-1].attributes.size())) {
+//    return "";
+//  }
+//  sprintf(ch, "%d", item_list[itemnum-1].attributes[attrnum-1].get_charnum());
+//  str  = ch + item_list[itemnum-1].attributes[attrnum-1].get_charcomment()
+//         + "," + item_list[itemnum-1].attributes[attrnum-1].get_alternatives();
+//  return str;
+//}
+
+//----- Retrieves an item attribute -------------------------------------------
 string tDeltaItemList::get_attribute(int itemnum, int attrnum) const
 {
-  string str;
-  char ch[8];
-
   if ((itemnum < 1) || (itemnum > (int)item_list.size())) {
     return "";
   }
   if ((attrnum < 1) || (attrnum > (int)item_list[itemnum-1].attributes.size())) {
     return "";
   }
-  sprintf(ch, "%d", item_list[itemnum-1].attributes[attrnum-1].get_charnum());
-  str  = ch + item_list[itemnum-1].attributes[attrnum-1].get_charcomment()
-         + "," + item_list[itemnum-1].attributes[attrnum-1].get_alternatives();
+  
+  // Use std::to_string instead of sprintf - safe and no buffer overflow
+  string str = std::to_string(item_list[itemnum-1].attributes[attrnum-1].get_charnum())
+               + item_list[itemnum-1].attributes[attrnum-1].get_charcomment()
+               + "," 
+               + item_list[itemnum-1].attributes[attrnum-1].get_alternatives();
   return str;
 }
-
 
 //----- Searches the first item matching with a given character value(s) ------
 int tDeltaItemList::first_matching(int charnum, double *values, int nbval,
