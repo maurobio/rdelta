@@ -7,10 +7,6 @@ Provides an R interface to the 'tDelta' C++ library for parsing     DELTA (***DE
 
 ## Installation
 
-Installing from CRAN:
-
-`install.packages("RDelta")`
-
 Installing fro GitHub:
 
 `remotes::install_github("maurobio/rdelta")`
