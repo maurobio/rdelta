@@ -9,11 +9,11 @@ Provides an R interface to the 'tDelta' C++ library for parsing     'DELTA' (***
 
 Installing from GitHub:
 
-`install.packages("devtools")`
-
-`library(devtools)`
-
-`install_github("maurobio/rdelta")`
+```
+install.packages("devtools")
+library(devtools)
+install_github("maurobio/rdelta")
+```
 
 Some of the package functions assumes that the DELTA system CONFOR, KEY, or DIST program executables are available in the system PATH or in the current working directory. Get these programs from here: https://github.com/maurobio/freedelta/tree/main/classic_delta
 
@@ -21,22 +21,30 @@ Some of the package functions assumes that the DELTA system CONFOR, KEY, or DIST
 
 #### Load a DELTA dataset:
 
-`library(RDelta)`
-`delta <- load_delta("chars", "items", "specs")`
+```
+library(RDelta)
+delta <- load_delta("chars", "items", "specs")
+```
 
 #### List characters:
 
-`cat("\nCHARACTERS LIST:\n")`
-``for (i in 1:Example$get_chars_nb()) {`	`cat(i, " : ", Example$get_char_feature(i), "\n")`
-`}``cat("*** ", Example$get_chars_nb(), " characters ***\n")`
+```
+cat("\nCHARACTERS LIST:\n")
+for (i in 1:Example$get_chars_nb()) {
+	cat(i, " : ", Example$get_char_feature(i), "\n")
+}
+cat("* ", Example$get_chars_nb(), " characters *\n")
+```
 
 #### List items:
 
-`cat("\nITEMS LIST:\n")`
-`for (i in 1:Example$get_items_nb()) {`
-      `cat(i, " : ", Example$get_item_name(i), "\n")`
-`}`
-`cat("* ", Example$get_items_nb(), " items *\n")`
+```
+cat("\nITEMS LIST:\n")
+for (i in 1:Example$get_items_nb()) {
+	cat(i, " : ", Example$get_item_name(i), "\n")
+}
+cat("* ", Example$get_items_nb(), " items *\n")
+```
 
 #### Create a dichotomous key (with default parameters):
 
