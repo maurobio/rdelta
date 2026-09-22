@@ -1,15 +1,19 @@
 # RDelta
 Parse and Query DELTA-Format Taxonomic Descriptions.
 
-Provides an R interface to the 'tDelta' C++ library for parsing     DELTA (***DE**scription **L**anguage for **TA**xonomy*) format files (<https://freedelta.sourceforge.net>). Supports loading character lists, item descriptions, and specifications, with efficient searching and matching of items based on character values. It also supports the generation of identification keys, diagnoses, natural-language descriptions,    and clustering and ordination analyses by means of the DELTA programs CONFOR, KEY, and DIST.
+Provides an R interface to the 'tDelta' C++ library for parsing     'DELTA' (***DE**scription **L**anguage for **TA**xonomy*) format files (<https://freedelta.sourceforge.net>). Supports loading character lists, item descriptions, and specifications, with efficient searching and matching of items based on character values. It also supports the generation of identification keys, diagnoses, natural-language descriptions,    and clustering and ordination analyses by means of the 'DELTA' programs 'CONFOR', 'KEY', and 'DIST'.
 
 
 
 ## Installation
 
-Installing fro GitHub:
+Installing from GitHub:
 
-`remotes::install_github("maurobio/rdelta")`
+`install.packages("devtools")`
+
+`library(devtools)`
+
+`install_github("maurobio/rdelta")`
 
 Some of the package functions assumes that the DELTA system CONFOR, KEY, or DIST program executables are available in the system PATH or in the current working directory. Get these programs from here: https://github.com/maurobio/freedelta/tree/main/classic_delta
 
@@ -17,8 +21,8 @@ Some of the package functions assumes that the DELTA system CONFOR, KEY, or DIST
 
 #### Load a DELTA dataset:
 
-`library(DeltaR)`
-`delta <- load_delta("chars", "items", "specs")```
+`library(RDelta)`
+`delta <- load_delta("chars", "items", "specs")`
 
 #### List characters:
 
