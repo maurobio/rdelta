@@ -27,24 +27,20 @@ Some of the package functions assumes that the DELTA system CONFOR, KEY, or DIST
 #### List characters:
 
 `cat("\nCHARACTERS LIST:\n")`
-`for (i in 1:Example$get_chars_nb()) {`
-	`cat(i, " : ", Example$get_char_feature(i), "\n")`
-`}`
-`cat("*** ", Example$get_chars_nb(), " characters ***\n")`
+``for (i in 1:Example$get_chars_nb()) {`	`cat(i, " : ", Example$get_char_feature(i), "\n")`
+`}``cat("*** ", Example$get_chars_nb(), " characters ***\n")`
 
 #### List items:
 
 `cat("\nITEMS LIST:\n")`
 `for (i in 1:Example$get_items_nb()) {`
-	`cat(i, " : ", Example$get_item_name(i), "\n")`
+      `cat(i, " : ", Example$get_item_name(i), "\n")`
 `}`
-`cat("*** ", Example$get_items_nb(), " items ***\n")`
+`cat("* ", Example$get_items_nb(), " items *\n")`
 
 #### Create a dichotomous key (with default parameters):
 
 `key(delta)`
-
-`natlan(delta)`
 
 #### Create a natural-language description:
 
