@@ -46,6 +46,6 @@ Some of the package functions assumes that the DELTA system CONFOR, KEY, or DIST
 
 `natlan(delta)`
 
-Create a natural-language description:
+#### Create a natural-language description:
 
 `natlan(delta)`
