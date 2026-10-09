@@ -28,7 +28,7 @@ Check if character is dependent
 Check if a character is dependent
 }
 \examples{
-\dontrun{
+\donttest{
 delta <- load_delta("chars", "items", "specs")
 is_dependent(delta, 14, 13, 2)
 }

@@ -18,7 +18,7 @@ Integer vector of implicit values
 Get all implicit values
 }
 \examples{
-\dontrun{
+\donttest{
 delta <- load_delta("chars", "items", "specs")
 get_all_implicit_values(delta)
 }

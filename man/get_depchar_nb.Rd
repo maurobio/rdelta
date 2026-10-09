@@ -26,7 +26,7 @@ Get number of dependent characters (C++ style)
 Get number of dependent characters
 }
 \examples{
-\dontrun{
+\donttest{
 delta <- load_delta("chars", "items", "specs")
 get_depchar_nb(delta, 13, 2)
 }

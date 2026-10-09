@@ -1,7 +1,7 @@
 #' Generate Dichotomous Key using CONFOR/KEY
-#' 
+#'
 #' This function replicates the KEY command in the DELTA system for generating
-#' dichotomous keys. It creates the necessary directives files and runs the 
+#' dichotomous keys. It creates the necessary directives files and runs the
 #' CONFOR and KEY programs.
 #'
 #' @param delta A Delta dataset object (created by \code{\link{load_delta}})
@@ -26,70 +26,70 @@
 #' @return Invisibly returns the key as a character vector on success
 #' @export
 #'
-#' @details The function assumes that the CONFOR and KEY program executables are available 
+#' @details The function assumes that the CONFOR and KEY program executables are available
 #'          in the system PATH or in the current working directory.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Load a DELTA dataset
 #' delta <- load_delta("chars", "items", "specs")
-#' 
+#'
 #' # Generate dichotomous key
 #' key(delta)
-#' 
+#'
 #' # With custom options
-#' key(delta, abase = 2, rbase = 1.4, 
+#' key(delta, abase = 2, rbase = 1.4,
 #'     no_tabular_key = TRUE, number_of_confirmatory_characters = 2)
 #' }
-key <- function(delta, 
+key <- function(delta,
                 heading = NULL,
-                add_character_numbers = FALSE, 
-                no_bracketted_key = FALSE, 
-                no_tabular_key = TRUE, 
-                number_of_confirmatory_characters = 0, 
+                add_character_numbers = FALSE,
+                no_bracketted_key = FALSE,
+                no_tabular_key = TRUE,
+                number_of_confirmatory_characters = 0,
                 treat_characters_as_variable = NULL,
                 use_normal_values = NULL,
                 character_reliabilities = NULL,
                 key_states = NULL,
-                abase = 2, 
-                rbase = 1.4, 
-                reuse = 1.01, 
-                varywt = 0.8, 
-                print_width = 80, 
-                exclude_items = NULL, 
+                abase = 2,
+                rbase = 1.4,
+                reuse = 1.01,
+                varywt = 0.8,
+                print_width = 80,
+                exclude_items = NULL,
                 exclude_characters = NULL,
                 remove_temp = TRUE) {
-  
+
   # Validate input
   if (!inherits(delta, "Rcpp_DeltaParser") && !inherits(delta, "DeltaParser")) {
     stop("'delta' must be a DeltaParser object created by load_delta()")
   }
-  
+
   if (!(delta$is_parsed() && delta$is_items_parsed())) {
     stop("Error: Delta dataset not properly parsed")
   }
-  
+
   # Get file information
   chars_file <- delta$get_filename()
   items_file <- delta$get_items_filename()
   has_specs <- delta$has_specifications()
   specs_file <- if (has_specs) delta$get_specs_filename() else NULL
-  
+
   # Get counts
   num_chars <- delta$get_chars_nb()
   num_items <- delta$get_items_nb()
-  
+
   # Validate parameters
   if (number_of_confirmatory_characters < 0 || number_of_confirmatory_characters > 4) {
     stop("number_of_confirmatory_characters must be between 0 and 4")
   }
-  
+
   if (abase <= 0) stop("abase must be positive")
   if (rbase <= 0) stop("rbase must be positive")
   if (reuse <= 0) stop("reuse must be positive")
   if (varywt < 0 || varywt > 1) stop("varywt must be between 0 and 1")
   if (print_width <= 0) stop("print_width must be positive")
-  
+
   # Get heading
   heading_text <- "DELTA Dataset"
   if (!is.null(heading)) {
@@ -103,35 +103,43 @@ key <- function(delta,
       }
     }
   }
-  
+
+  # Work in a temporary directory so we do not write to the user's filespace
+  tmp_dir <- file.path(tempdir(), paste0("RDelta_key_", Sys.getpid()))
+  dir.create(tmp_dir, showWarnings = FALSE, recursive = TRUE)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+
+  old_wd <- setwd(tmp_dir)
+  on.exit(setwd(old_wd), add = TRUE)
+
   # --- FIRST STAGE: Create CONFOR directives to generate KEY binary files ---
   con_file <- "tokey"
   con_in <- file(con_file, "w")
-  
+
   cat("*SHOW Translate into KEY format\n", file = con_in)
   cat("*SHOW Generated on ", format(Sys.time(), "%d/%m/%Y %H:%M:%S"), "\n\n", sep = "", file = con_in)
   cat("*HEADING ", heading_text, "\n\n", sep = "", file = con_in)
-  
+
   # Include specifications file if it exists
   if (!is.null(specs_file) && file.exists(specs_file)) {
     cat("*INPUT FILE ", specs_file, "\n\n", sep = "", file = con_in)
   }
-  
+
   # Add USE NORMAL VALUES if specified
   if (!is.null(use_normal_values) && length(use_normal_values) > 0) {
     cat("*USE NORMAL VALUES ", paste(use_normal_values, collapse = " "), "\n", sep = "", file = con_in)
   }
-  
+
   # Add CHARACTER RELIABILITIES if specified
   if (!is.null(character_reliabilities) && length(character_reliabilities) > 0) {
     cat("*CHARACTER RELIABILITIES ", paste(character_reliabilities, collapse = " "), "\n", sep = "", file = con_in)
   }
-  
+
   # Add KEY STATES if specified
   if (!is.null(key_states) && length(key_states) > 0) {
     cat("*KEY STATES ", paste(key_states, collapse = " "), "\n", sep = "", file = con_in)
   }
-  
+
   # Add EXCLUDE ITEMS if specified
   if (!is.null(exclude_items) && length(exclude_items) > 0) {
     item_exclusions <- character()
@@ -148,11 +156,11 @@ key <- function(delta,
       }
     }
     if (length(item_exclusions) > 0) {
-      cat("*EXCLUDE ITEMS ", paste(item_exclusions, collapse = " "), "\n\n", 
+      cat("*EXCLUDE ITEMS ", paste(item_exclusions, collapse = " "), "\n\n",
           sep = "", file = con_in)
     }
   }
-  
+
   # Add EXCLUDE CHARACTERS if specified
   if (!is.null(exclude_characters) && length(exclude_characters) > 0) {
     char_exclusions <- character()
@@ -169,19 +177,19 @@ key <- function(delta,
       }
     }
     if (length(char_exclusions) > 0) {
-      cat("*EXCLUDE CHARACTERS ", paste(char_exclusions, collapse = " "), "\n\n", 
+      cat("*EXCLUDE CHARACTERS ", paste(char_exclusions, collapse = " "), "\n\n",
           sep = "", file = con_in)
     }
   }
-  
+
   cat("*TRANSLATE INTO KEY FORMAT\n\n", file = con_in)
   cat("*KEY OUTPUT FILE kchars\n", file = con_in)
   cat("*INPUT FILE ", chars_file, "\n\n", sep = "", file = con_in)
   cat("*KEY OUTPUT FILE kitems\n", file = con_in)
   cat("*INPUT FILE ", items_file, "\n", sep = "", file = con_in)
-  
+
   close(con_in)
-  
+
   # Run CONFOR
   if (Sys.info()["sysname"] == "Windows") {
     result <- system(paste("confor", con_file))
@@ -189,20 +197,20 @@ key <- function(delta,
     confor_cmd <- if (file.exists("./confor")) "./confor" else "confor"
     result <- system(paste(confor_cmd, con_file))
   }
-  
+
   if (result != 0) {
     stop("Error: CONFOR execution failed!")
   }
-  
+
   # Check if binary files were created
   if (!file.exists("kchars") || !file.exists("kitems")) {
     stop("Error: KEY binary files not created!")
   }
-  
+
   # --- SECOND STAGE: Create KEY directives ---
   dirfile <- "key"
   key_in <- file(dirfile, "w")
-  
+
   cat("*COMMENT Generate dichotomous key.\n", file = key_in)
   cat("*HEADING ", heading_text, "\n", sep = "", file = key_in)
   cat("*KEY OUTPUT FILE key.txt\n", file = key_in)
@@ -212,68 +220,64 @@ key <- function(delta,
   cat("*REUSE ", reuse, "\n", sep = "", file = key_in)
   cat("*VARYWT ", varywt, "\n", sep = "", file = key_in)
   cat("*PRINT WIDTH ", print_width, "\n", sep = "", file = key_in)
-  
+
   # Add NO options if specified
   if (no_bracketted_key) {
     cat("*NO BRACKETTED KEY\n", file = key_in)
   }
-  
+
   if (no_tabular_key) {
     cat("*NO TABULAR KEY\n", file = key_in)
   }
-  
+
   cat("\n", file = key_in)
   cat("*NUMBER OF CONFIRMATORY CHARACTERS ", number_of_confirmatory_characters, "\n", sep = "", file = key_in)
-  
+
   # Add TREAT CHARACTERS AS VARIABLE if specified
   if (!is.null(treat_characters_as_variable) && length(treat_characters_as_variable) > 0) {
     cat("*TREAT CHARACTERS AS VARIABLE ", paste(treat_characters_as_variable, collapse = " "), "\n", sep = "", file = key_in)
   }
-  
+
   # Add add_character_numbers option
   if (add_character_numbers) {
     cat("*ADD CHARACTER NUMBERS\n", file = key_in)
   }
-  
+
   close(key_in)
-  
-  # Run KEY - KEY automatically finds kchars and kitems in the current directory
+
+  # Run KEY
   if (Sys.info()["sysname"] == "Windows") {
     result <- system(paste("key", dirfile))
   } else {
     key_cmd <- if (file.exists("./key")) "./key" else "key"
     result <- system(paste(key_cmd, dirfile))
   }
-  
+
   if (result != 0) {
     stop("Error: KEY execution failed!")
   }
-  
+
   # Check if key file was created
   output_file <- "key.txt"
   if (!file.exists(output_file)) {
     stop("Error: KEY output file (key.txt) not created!")
   }
-  
+
   # Read the generated key
   key_output <- readLines(output_file)
-  
-  # Clean up temporary files (but keep the output file)
+
+  # Copy the output file to the user's working directory before cleanup
+  out_path <- file.path(old_wd, "key.txt")
+  file.copy(output_file, out_path, overwrite = TRUE)
+
+  # Clean up temporary files
   if (remove_temp) {
-    # Remove directives files
     if (file.exists(con_file)) unlink(con_file)
     if (file.exists(dirfile)) unlink(dirfile)
     if (file.exists(paste0(dirfile, ".lst"))) unlink(paste0(dirfile, ".lst"))
-    
-    # Remove CONFOR-generated binary files
     if (file.exists("kchars")) unlink("kchars")
     if (file.exists("kitems")) unlink("kitems")
-    
-    # DO NOT delete key.txt - this is the output file!
   }
-  
-  message("Dichotomous key generated successfully")
-  message("  - Key file: key.txt")
-  
+
   invisible(key_output)
 }

@@ -15,7 +15,7 @@
 #'          in the system PATH or in the current working directory.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Load a DELTA dataset
 #' delta <- load_delta("chars_viola", "items_viola", "specs_viola")
 #' 
@@ -120,11 +120,6 @@ uncoded <- function(delta, heading = NULL, remove_temp = TRUE) {
     if (file.exists(paste0(directives_file, ".lst"))) unlink(paste0(directives_file, ".lst"))
     # Keep uncoded.txt as the output file
   }
-  
-  message("Uncoded characters report generated successfully")
-  message("  - Number of items: ", num_items)
-  message("  - Number of characters: ", num_chars)
-  message("  - Output file: uncoded.txt")
-  
+    
   invisible(output_file)
 }

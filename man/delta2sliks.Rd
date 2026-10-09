@@ -32,14 +32,11 @@ The function assumes that the CONFOR program executable is available
 in the system PATH or in the current working directory.
 }
 \examples{
-\dontrun{
+\donttest{
 # Load a DELTA dataset
 delta <- load_delta("chars", "items", "specs")
 
 # Convert to SLIKS format
-delta2sliks(delta)
-
-# Convert with custom output file
-delta2sliks(delta, output_file = "mykey.js")
+delta2sliks(delta, output_file = file.path(tempdir(), "data.js"))
 }
 }

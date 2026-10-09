@@ -26,7 +26,7 @@ Get implicit value (C++ style)
 Get implicit value for a character
 }
 \examples{
-\dontrun{
+\donttest{
 delta <- load_delta("chars", "items", "specs")
 get_implicit_value(delta, 1)
 }

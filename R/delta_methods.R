@@ -5,7 +5,7 @@
 #' @param iv_type Implicit value type (1 or 2, default: 1)
 #' @return Integer value or NA if not defined
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' delta <- load_delta("chars", "items", "specs")
 #' get_implicit_value(delta, 1)
 #' }
@@ -20,7 +20,7 @@ get_implicit_value <- function(delta, charnum, iv_type = 1) {
 #' @param iv_type Implicit value type (1 or 2, default: 1)
 #' @return Integer vector of implicit values
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' delta <- load_delta("chars", "items", "specs")
 #' get_all_implicit_values(delta)
 #' }
@@ -36,7 +36,7 @@ get_all_implicit_values <- function(delta, iv_type = 1) {
 #' @param ccstate Control character state
 #' @return Number of dependent characters
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' delta <- load_delta("chars", "items", "specs")
 #' get_depchar_nb(delta, 13, 2)
 #' }
@@ -53,7 +53,7 @@ get_depchar_nb <- function(delta, ccnum, ccstate) {
 #' @param rank Rank position (default: 1)
 #' @return Dependent character number or 0 if none
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' delta <- load_delta("chars", "items", "specs")
 #' get_depchar(delta, 13, 2, 1)
 #' }
@@ -69,7 +69,7 @@ get_depchar <- function(delta, ccnum, ccstate, rank = 1) {
 #' @param ccstate Control character state
 #' @return Integer vector of dependent character numbers
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' delta <- load_delta("chars", "items", "specs")
 #' get_all_depchar(delta, 13, 2)
 #' }
@@ -86,7 +86,7 @@ get_all_depchar <- function(delta, ccnum, ccstate) {
 #' @param ccstate Control character state
 #' @return Logical indicating if dcnum is dependent
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' delta <- load_delta("chars", "items", "specs")
 #' is_dependent(delta, 14, 13, 2)
 #' }
@@ -100,7 +100,7 @@ is_dependent <- function(delta, dcnum, ccnum, ccstate) {
 #' @param delta A DeltaParser object
 #' @return List of all dependency relationships
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' delta <- load_delta("chars", "items", "specs")
 #' get_all_dependencies(delta)
 #' }

@@ -75,7 +75,7 @@ The function assumes that the CONFOR and KEY program executables are available
 in the system PATH or in the current working directory.
 }
 \examples{
-\dontrun{
+\donttest{
 # Load a DELTA dataset
 delta <- load_delta("chars", "items", "specs")
 
@@ -83,7 +83,7 @@ delta <- load_delta("chars", "items", "specs")
 key(delta)
 
 # With custom options
-key(delta, abase = 2, rbase = 1.4, 
+key(delta, abase = 2, rbase = 1.4,
     no_tabular_key = TRUE, number_of_confirmatory_characters = 2)
 }
 }

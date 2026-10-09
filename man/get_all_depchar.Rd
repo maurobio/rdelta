@@ -20,7 +20,7 @@ Integer vector of dependent character numbers
 Get all dependent characters
 }
 \examples{
-\dontrun{
+\donttest{
 delta <- load_delta("chars", "items", "specs")
 get_all_depchar(delta, 13, 2)
 }

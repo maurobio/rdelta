@@ -28,7 +28,7 @@ Get dependent character by rank (C++ style)
 Get dependent character at specific rank
 }
 \examples{
-\dontrun{
+\donttest{
 delta <- load_delta("chars", "items", "specs")
 get_depchar(delta, 13, 2, 1)
 }

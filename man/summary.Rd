@@ -26,7 +26,7 @@ The function assumes that the CONFOR program executable is available
 in the system PATH or in the current working directory.
 }
 \examples{
-\dontrun{
+\donttest{
 # Load a DELTA dataset
 delta <- load_delta("chars_viola", "items_viola", "specs_viola")
 

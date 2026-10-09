@@ -7,10 +7,23 @@
 pcoa(notu)
 }
 \arguments{
-\item{notu}{Number of operational taxonomic units (items) in the dataset}
+\item{notu}{Number of operational taxonomic units (items) in the dataset.}
 }
 \value{
-Invisibly returns the PCoA results from cmdscale()
+Invisibly returns a list with the following components:
+\describe{
+\item{points}{A two-column matrix of the coordinates of the items on
+the first two principal coordinate axes.}
+\item{eig}{The eigenvalues of the PCoA solution, as returned by
+\code{\link[stats]{cmdscale}}.}
+\item{variance}{A numeric vector of length 2 giving the proportion of
+total variance explained by Axis 1 and Axis 2 (values between 0 and 1).}
+\item{cumulative}{A single numeric value giving the cumulative
+proportion of variance explained by the first two axes combined.}
+\item{cmdscale}{The full result object returned by
+\code{\link[stats]{cmdscale}}, for users who need access to all
+components.}
+}
 }
 \description{
 Performs principal coordinates analysis (PCoA) on a distance matrix generated
@@ -18,12 +31,14 @@ by the dist() function. This function reads the distance matrix and item names
 from the DIST output files and creates a PCoA scatterplot.
 }
 \examples{
-\dontrun{
+\donttest{
 # First generate a distance matrix
 delta <- load_delta("chars", "items", "specs")
 dist(delta)
 
 # Then perform PCoA
-pcoa(delta$get_items_nb())
+res <- pcoa(delta$get_items_nb())
+res$variance      # variance explained by axes 1 and 2
+res$cumulative    # cumulative variance of axes 1 and 2
 }
 }

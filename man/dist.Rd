@@ -50,7 +50,7 @@ The function assumes that the CONFOR and DIST program executables are available
 in the system PATH or in the current working directory.
 }
 \examples{
-\dontrun{
+\donttest{
 # Load a DELTA dataset
 delta <- load_delta("chars", "items", "specs")
 
@@ -58,7 +58,7 @@ delta <- load_delta("chars", "items", "specs")
 dist(delta)
 
 # With custom options
-dist(delta, match_overlap = TRUE, phylip_format = TRUE, 
+dist(delta, match_overlap = TRUE, phylip_format = TRUE,
      minimum_comparisons = 10)
 }
 }

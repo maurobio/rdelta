@@ -84,7 +84,7 @@ The function assumes that the CONFOR program executable is available
 in the system PATH or in the current working directory.
 }
 \examples{
-\dontrun{
+\donttest{
 # Load a DELTA dataset
 delta <- load_delta("chars_viola", "items_viola", "specs_viola")
 
@@ -92,7 +92,7 @@ delta <- load_delta("chars_viola", "items_viola", "specs_viola")
 natlan(delta)
 
 # With custom heading and subheadings
-natlan(delta, 
+natlan(delta,
        heading = "Flora of Region X - species descriptions",
        item_subheadings = list(
          "87" = "Transverse section of lamina",

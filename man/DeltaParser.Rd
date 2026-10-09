@@ -14,7 +14,7 @@ DeltaParser(file)
 An object of class \code{Rcpp_DeltaParser}.
 }
 \examples{
-\dontrun{
+\donttest{
 parser <- DeltaParser("path/to/delta/file.txt")
 }
 }

@@ -16,7 +16,7 @@ List of all dependency relationships
 Get all dependency relationships
 }
 \examples{
-\dontrun{
+\donttest{
 delta <- load_delta("chars", "items", "specs")
 get_all_dependencies(delta)
 }

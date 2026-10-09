@@ -23,7 +23,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-//#include <iostream>
 #include <cstring>
 #include <cstdio>
 
@@ -131,8 +130,7 @@ int tDeltaCharList::parse_characters(void)
   }
   //--- Open the file ---
   if (!fchars->open(AM_READ)) {
-    Rcpp::Rcerr << "Unable to open " << fchars->get_name() << endl;
-    return 0;
+    Rcpp::stop("Unable to open %s", fchars->get_name());
   }
   ok = 1;
   p1 = NULL;
@@ -144,14 +142,12 @@ int tDeltaCharList::parse_characters(void)
       if (!ok) {
         //--- End of file or error ---
         if (!fchars->eof()) {
-          Rcpp::Rcerr << "Error reading " << fchars->get_name() << endl;
-          return 0;
+          Rcpp::stop("Error reading %s", fchars->get_name());
         }
         if (nbchars)   // at least one character is already read
           char_list.push_back(cd);  // Store the last character read
-        //retrieve_all();  //debug
         //--- End parsing ---
-	parsed = 1;
+        parsed = 1;
         return 1;
       }
       p1 = cline;
@@ -264,27 +260,11 @@ string tDeltaCharList::get_state(int charnum, int statenum) const
     return "";
 }
 
-//----- For debuging
+//----- For debugging (kept as no-op to avoid breaking any caller) ------------
 void tDeltaCharList::retrieve_all(void)
 {
-  int i, j;
-
-  Rcpp::Rcout << endl << "CHARACTER FILE : " << get_filename() << endl;
-  Rcpp::Rcout << "Directives" << endl;
-  Rcpp::Rcout << "----------" << endl;
-  for (i=0; i<(int)directives.size(); i++)
-    Rcpp::Rcout << directives[i] << endl;
-  Rcpp::Rcout << "Character list" << endl;
-  Rcpp::Rcout << "--------------" << endl;
-  for (i=0; i<(int)char_list.size(); i++) {
-    Rcpp::Rcout << "Character " << (i+1) << " : " << char_list[i].feature << endl;
-    if (char_list[i].char_type & CT_UM)
-      for (j=0; j<(int)char_list[i].states.size(); j++)
-        Rcpp::Rcout << "  State " << (j+1) << " : " << char_list[i].states[j] << endl;
-    else
-      if (char_list[i].char_type & CT_IN)
-        Rcpp::Rcout << "  Unit : " << char_list[i].unit << endl;
-  }
+  // Debug output removed to comply with CRAN policy.
+  // Information is accessible via the public getter methods.
 }
 
 
@@ -302,15 +282,15 @@ int tDeltaCharList::read_directive(char *cline, char * & p1)
 int tDeltaCharList::read_character(char *cline, char * & p1)
 {
   char buf[BUFSIZE];
-  char *p2;;
+  char *p2;
   int n, stop;
 
   //--- Extract and verify the character number ---
   p1++;
   n = atoi(p1);
   if (n != nbchars+1) {
-    Rcpp::Rcerr << "Parse error line " << fchars->get_lines_nb() << " : character sequence break" << endl;
-    return 0;
+    Rcpp::stop("Parse error line %d : character sequence break",
+               fchars->get_lines_nb());
   }
   nbchars++;
   //----- Extract feature description -----
@@ -325,7 +305,7 @@ int tDeltaCharList::read_character(char *cline, char * & p1)
     if (!*p1) {
       if (!fchars->next_line(cline)) {
         if (!fchars->eof())
-          Rcpp::Rcerr << "Error reading " << fchars->get_name() << endl;
+          Rcpp::stop("Error reading %s", fchars->get_name());
         return 0;
       }
       p1 = cline;
@@ -343,8 +323,9 @@ int tDeltaCharList::read_character(char *cline, char * & p1)
   }
   //----- Store character feature -----
   cd.feature = buf;
-  cd.char_type = CT_TE;  // Default = text character. Will be overridden if
-                         // numeric or multistate character (cf read_state())
+  cd.char_type = CT_TE;  // Default = text character.
+                         // Will be overridden if numeric or multistate
+                         // character (cf read_state())
   //----- Moves pointer at end of line or at the begin of next sentence -----
   p1++;
   while ((*p1==' ')||(*p1=='\t'))
@@ -364,8 +345,8 @@ int tDeltaCharList::read_state(char *cline, char * & p1, int & nbstates)
   if (*p1>='0' && *p1<='9') {  // if there is a state number
     n = atoi(p1);
     if (n != nbstates+1) {
-      Rcpp::Rcerr << "Parse error line " << fchars->get_lines_nb() << " : state sequence break" << endl;
-      return 0;
+      Rcpp::stop("Parse error line %d : state sequence break",
+                 fchars->get_lines_nb());
     }
     nbstates++;
   }
@@ -383,7 +364,7 @@ int tDeltaCharList::read_state(char *cline, char * & p1, int & nbstates)
     if (!*p1) {
       if (!fchars->next_line(cline)) {
         if (!fchars->eof())
-          Rcpp::Rcerr << "Error reading " << fchars->get_name() << endl;
+          Rcpp::stop("Error reading %s", fchars->get_name());
         return 0;
       }
       p1 = cline;
@@ -458,8 +439,7 @@ int tDeltaItemList::parse_items(void)
   }
   //--- Open the file ---
   if (!fitems->open(AM_READ)) {
-    Rcpp::Rcerr << "Unable to open " << fitems->get_name() << endl;
-    return 0;
+    Rcpp::stop("Unable to open %s", fitems->get_name());
   }
   ok = 1;
   p1 = NULL;
@@ -471,13 +451,12 @@ int tDeltaItemList::parse_items(void)
       if (!ok) {
         //--- End of file or error ---
         if (!fitems->eof()) {
-          Rcpp::Rcerr << "Error reading " << fitems->get_name() << endl;
-          return 0;
+          Rcpp::stop("Error reading %s", fitems->get_name());
         }
         if (nbitems)   // at least one item is already read
           item_list.push_back(id);  // Store the last item read
         //--- End parsing ---
-	parsed = 1;
+        parsed = 1;
         return 1;
       }
       p1 = cline;
@@ -498,7 +477,7 @@ int tDeltaItemList::parse_items(void)
         ok = read_item(cline, p1);
       }
       else
-        Rcpp::Rcerr << "Error parsing " << fitems->get_name() << endl;
+        Rcpp::stop("Error parsing %s", fitems->get_name());
   }
   return 0;
 }
@@ -555,24 +534,6 @@ int tDeltaItemList::get_attributes_nb(int itemnum) const
 }
 
 //----- Retrieves an item attribute -------------------------------------------
-//string tDeltaItemList::get_attribute(int itemnum, int attrnum) const
-//{
-//  string str;
-//  char ch[8];
-
-// if ((itemnum < 1) || (itemnum > (int)item_list.size())) {
-//    return "";
-//  }
-//  if ((attrnum < 1) || (attrnum > (int)item_list[itemnum-1].attributes.size())) {
-//    return "";
-//  }
-//  sprintf(ch, "%d", item_list[itemnum-1].attributes[attrnum-1].get_charnum());
-//  str  = ch + item_list[itemnum-1].attributes[attrnum-1].get_charcomment()
-//         + "," + item_list[itemnum-1].attributes[attrnum-1].get_alternatives();
-//  return str;
-//}
-
-//----- Retrieves an item attribute -------------------------------------------
 string tDeltaItemList::get_attribute(int itemnum, int attrnum) const
 {
   if ((itemnum < 1) || (itemnum > (int)item_list.size())) {
@@ -581,11 +542,11 @@ string tDeltaItemList::get_attribute(int itemnum, int attrnum) const
   if ((attrnum < 1) || (attrnum > (int)item_list[itemnum-1].attributes.size())) {
     return "";
   }
-  
+
   // Use std::to_string instead of sprintf - safe and no buffer overflow
   string str = std::to_string(item_list[itemnum-1].attributes[attrnum-1].get_charnum())
                + item_list[itemnum-1].attributes[attrnum-1].get_charcomment()
-               + "," 
+               + ","
                + item_list[itemnum-1].attributes[attrnum-1].get_alternatives();
   return str;
 }
@@ -651,30 +612,11 @@ int tDeltaItemList::tItemDescr::matches(int charnum, double *values, int nbval,
     return 1;
 }
 
-//----- For debuging
+//----- For debugging (kept as no-op to avoid breaking any caller) ------------
 void tDeltaItemList::retrieve_all(void)
 {
-  int i,j;
-
-  Rcpp::Rcout << endl <<"ITEM FILE : " << get_filename() << endl;
-  Rcpp::Rcout << "Directives" << endl;
-  Rcpp::Rcout << "----------" << endl;
-  for (i=0; i<(int)directives.size(); i++)
-    Rcpp::Rcout << directives[i] << endl;
-  Rcpp::Rcout << "Item list" << endl;
-  Rcpp::Rcout << "---------" << endl;
-  for (i=0; i<(int)item_list.size(); i++) {
-    Rcpp::Rcout << "Item " << (i+1) << " : " << item_list[i].name << endl;
-    for (j=0; j < (int)item_list[i].attributes.size(); j++) {
-      Rcpp::Rcout << "  Character " << item_list[i].attributes[j].get_charnum() << endl;
-      string str = item_list[i].attributes[j].get_charcomment();
-      if (str.size())
-        Rcpp::Rcout << "    Comment : " << str << endl;
-      str = item_list[i].attributes[j].get_alternatives();
-      if (str.size())
-        Rcpp::Rcout << "    Alternatives : " << str << endl;
-    }
-  }
+  // Debug output removed to comply with CRAN policy.
+  // Information is accessible via the public getter methods.
 }
 
 
@@ -708,9 +650,10 @@ int tDeltaItemList::read_item(char *cline, char * & p1)
     if (!*p1) {
       if (!fitems->next_line(cline)) {
         if (!fitems->eof())  // read error
-          Rcpp::Rcerr << "Error reading " << fitems->get_name() << endl;
+          Rcpp::stop("Error reading %s", fitems->get_name());
         else                 // EOF
-          Rcpp::Rcerr << "Error parsing " << fitems->get_name() << " : item name without attributes" << endl;
+          Rcpp::stop("Error parsing %s : item name without attributes",
+                     fitems->get_name());
         return 0;
       }
       p1 = cline;
@@ -748,7 +691,7 @@ int tDeltaItemList::read_attributes(char *cline, char * & p1)
     if (!*p1) {
       if (!fitems->next_line(cline)) {
         if (!fitems->eof()) {
-          Rcpp::Rcerr << "Error reading " << fitems->get_name() << endl;
+          Rcpp::stop("Error reading %s", fitems->get_name());
           return 0;
         }
         else {   // end of file
@@ -848,8 +791,7 @@ int tAttrDescr::extract_comment(char * & src, char *dest, int lmax)
   *p1= 0;
   //--- Ending
   if (!*src) {
-    Rcpp::Rcerr << "Parse error : end of comment character '>' missing" << endl;
-    return 0;  // abnormal
+    Rcpp::stop("Parse error : end of comment character '>' missing");
   }
   else
     src++;  // skip '>'
@@ -1086,7 +1028,6 @@ int tDeltaSpecs::parse_specs(void)
 {
   char cline[LMAXLINE];
   char buf[BUFSIZE];
-  char *p1;
   int n, ok;
 
   //--- Test if specifications file exist ---
@@ -1107,8 +1048,7 @@ int tDeltaSpecs::parse_specs(void)
   impl_val.assign(n, tImplVal{0, 0});
   //--- Open the file ---
   if (!fspecs->open(AM_READ)) {
-    Rcpp::Rcerr << "Unable to open " << fspecs->get_name() << endl;
-    return 0;
+    Rcpp::stop("Unable to open %s", fspecs->get_name());
   }
   *buf = '\x0';
   //--- Reading loop ---
@@ -1117,8 +1057,7 @@ int tDeltaSpecs::parse_specs(void)
       if (!ok) {
         //--- End of file or error ---
         if (!fspecs->eof()) {
-          Rcpp::Rcerr << "Error reading " << fspecs->get_name() << endl;
-          return 0;
+          Rcpp::stop("Error reading %s", fspecs->get_name());
         }
         if (*buf)   // at least one specification is already read
           specs_list.push_back(buf);  // Store the last specification read
@@ -1133,7 +1072,7 @@ int tDeltaSpecs::parse_specs(void)
       strcpy(buf, cline+1);
     }
     else {           // additional specification line
-      p1 = cline;
+      char *p1 = cline;
       while ((*p1==' ')||(*p1=='\t'))  // skip blank and tab at begin of line
         p1++;
       if ((*p1) && (*buf)) {
@@ -1261,36 +1200,11 @@ int tDeltaSpecs::is_dependent(int dcnum, int ccnum, int ccstate) const
 }
 
 
-// For debugging
+// For debugging (kept as no-op to avoid breaking any caller)
 void tDeltaSpecs::retrieve_all(void)
 {
-  int i, j, n;
-
-  Rcpp::Rcout << endl << "SPECIFICATION FILE : " << get_filename() << endl;
-  Rcpp::Rcout << "Implicit values" << endl;
-  Rcpp::Rcout << "---------------" << endl;
-  n = chars->get_chars_nb();
-  for (i=0; i<n; i++)
-    if (impl_val[i].iv1) {
-      Rcpp::Rcout << "Character " << i << " : " << impl_val[i].iv1;
-      if (impl_val[i].iv2)
-        Rcpp::Rcout << "/" << impl_val[i].iv2;
-      Rcpp::Rcout << endl;
-    }
-  Rcpp::Rcout << "Character dependencies" << endl;
-  Rcpp::Rcout << "----------------------" << endl;
-  for (i=0; i<(int)char_dep.size(); i++) {
-    Rcpp::Rcout << "Control character " << char_dep[i].cc << ", state(s) ";
-    for (j=0; j<(int)sizeof(int); j++)
-      if (char_dep[i].st & (1 << j))
-        Rcpp::Rcout << (j+1) << " ";
-    Rcpp::Rcout << endl;
-    Rcpp::Rcout << "  Dependent character(s) : ";
-    for (j=0; j<n; j++)
-      if (char_dep[i].dc[j] == '1')
-          Rcpp::Rcout << (j+1) << " ";
-    Rcpp::Rcout << endl;
-  }
+  // Debug output removed to comply with CRAN policy.
+  // Information is accessible via the public getter methods.
 }
 
 
@@ -1358,8 +1272,8 @@ void tDeltaSpecs::parse_char_types(const char *ch)
         if (!strncmp(p1, "RN", 2))
           ct = CT_RN;
         if (!ct) {
-          Rcpp::Rcerr << "Error parsing " << get_filename() << " : erroneous character type" << endl;
-          return;
+          Rcpp::stop("Error parsing %s : erroneous character type",
+                     get_filename());
         }
         //--- Storing character type
         for (i = n1; i <= n2; i++) {
@@ -1368,8 +1282,9 @@ void tDeltaSpecs::parse_char_types(const char *ch)
           if (((ct0 & CT_UM) && !(ct & CT_UM)) ||
               ((ct0 & CT_IN) && !(ct & CT_IN)) ||
               ((ct0 & CT_TE) && !((ct & CT_TE) || (ct & CT_IN)))) {
-            Rcpp::Rcerr << "Error parsing " << get_filename() << " : " << endl
-                 << "  Incompatible character type between chars and specs file for character " << i << endl;
+            Rcpp::stop("Error parsing %s : incompatible character type "
+                       "between chars and specs file for character %d",
+                       get_filename(), i);
           }
           else
             chars->set_char_type(i, ct);
@@ -1377,8 +1292,7 @@ void tDeltaSpecs::parse_char_types(const char *ch)
         p1++; p1++;
     }
     else {
-      Rcpp::Rcerr << "Error parsing " << get_filename() << endl;
-      return;
+      Rcpp::stop("Error parsing %s", get_filename());
     }  // if (*p1==',')
   }  // while (p1)
 }
@@ -1433,8 +1347,7 @@ void tDeltaSpecs::parse_implicit_values(const char *ch)
         }
     }
     else {
-      Rcpp::Rcerr << "Error parsing " << get_filename() << endl;
-      return;
+      Rcpp::stop("Error parsing %s", get_filename());
     }  // if (*p1==',')
   }  // while (*p1)
 }
@@ -1465,8 +1378,7 @@ void tDeltaSpecs::parse_char_dependencies(const char *ch)
     if ((*p1==',') && (cd.cc > 0))
       p1++;
     else {
-      Rcpp::Rcerr << "Error parsing 1 " << get_filename() << p1 << endl;
-      break;
+      Rcpp::stop("Error parsing %s : %s", get_filename(), p1);
     }
     //--- Reading control character states
     stop = 0;
@@ -1475,12 +1387,11 @@ void tDeltaSpecs::parse_char_dependencies(const char *ch)
       n = atoi(p1);
       if (n > 0) {
         if (n > (int)(sizeof(cd.st) * 8))
-          Rcpp::Rcerr << "Too high state number, not considered"  << endl;
+          Rcpp::stop("Too high state number, not considered");
         else
           cd.st |= 1 << (n-1);
       } else {
-        Rcpp::Rcerr << "Error parsing 2 " << get_filename() << endl;
-        return;
+        Rcpp::stop("Error parsing %s", get_filename());
       }
       while (*p1>='0' && *p1<='9')
         p1++;
@@ -1492,8 +1403,7 @@ void tDeltaSpecs::parse_char_dependencies(const char *ch)
     if (*p1==':')
       p1++;
     else {
-      Rcpp::Rcerr << "Error parsing 3 " << get_filename() << endl;
-      return;
+      Rcpp::stop("Error parsing %s", get_filename());
     }
     //--- Reading dependent characters
     cd.dcnb = 0;
@@ -1517,8 +1427,7 @@ void tDeltaSpecs::parse_char_dependencies(const char *ch)
           cd.dcnb++;
         }
       } else {
-        Rcpp::Rcerr << "Error parsing 4 " << get_filename() << endl;
-        return;
+        Rcpp::stop("Error parsing %s", get_filename());
       }
       if (*p1==':')
         p1++;
@@ -1540,7 +1449,7 @@ string remove_comments(const std::string& src)
 {
   std::string result;
   int comment = 0;
-  
+
   for (char c : src) {
     if (c == '<') {
       comment++;
