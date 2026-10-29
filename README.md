@@ -1,5 +1,6 @@
-# RDelta
-Parse and Query DELTA-Format Taxonomic Descriptions.
+# <img src="images\icon.png" alt="Free Delta" style="zoom:150%;" /> RDelta
+
+# Parse and Query DELTA-Format Taxonomic Descriptions.
 
 Provides an R interface to the 'tDelta' C++ library for parsing     'DELTA' (***DE**scription **L**anguage for **TA**xonomy*) format files (<https://freedelta.sourceforge.net>). Supports loading character lists, item descriptions, and specifications, with efficient searching and matching of items based on character values. It also supports the generation of identification keys, diagnoses, natural-language descriptions,    and clustering and ordination analyses by means of the DELTA programs 'CONFOR', 'KEY', and 'DIST'.
 
