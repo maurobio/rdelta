@@ -14,9 +14,11 @@ Installing from CRAN:
 
 Installing from GitHub:
 
-install.packages("devtools")
-library(devtools)
-install_github("maurobio/rdelta")
+`install.packages("devtools")`
+
+`library(devtools)`
+
+`install_github("maurobio/rdelta")`
 
 
 
