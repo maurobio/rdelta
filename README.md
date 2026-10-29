@@ -9,14 +9,14 @@ Provides an R interface to the 'tDelta' C++ library for parsing     'DELTA' (***
 
 Installing from CRAN:
 
-`install.packages("RDelta")`
+install.packages("RDelta")`
 
 Installing from GitHub:
 
-```
 install.packages("devtools")
 library(devtools)
 install_github("maurobio/rdelta")
+
 ```
 
 Some of the package functions assumes that the DELTA system CONFOR, KEY, or DIST program executables are available in the system PATH or in the current working directory. Get these programs from here: https://github.com/maurobio/freedelta/tree/main/classic_delta
@@ -57,3 +57,4 @@ cat("* ", Example$get_items_nb(), " items *\n")
 #### Create a natural-language description:
 
 `natlan(delta)`
+```
