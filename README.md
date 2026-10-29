@@ -9,13 +9,13 @@ Provides an R interface to the 'tDelta' C++ library for parsing     'DELTA' (***
 
 Installing from CRAN:
 
-`install.packages("RDelta")``
+`install.packages("RDelta")`
 
 Installing from GitHub:
 
-`install.packages("devtools")
-library(devtools)
-install_github("maurobio/rdelta")``
+`install.packages("devtools")`
+`library(devtools)`
+`install_github("maurobio/rdelta")`
 
 
 
