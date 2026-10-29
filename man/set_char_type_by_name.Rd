@@ -13,6 +13,10 @@ set_char_type_by_name(delta, charnum, type_name)
 
 \item{type_name}{Character type name}
 }
+\value{
+No return value, called for side effects. The character type of
+\code{charnum} is modified in \code{delta} in place.
+}
 \description{
 Set character type by name
 }

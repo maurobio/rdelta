@@ -23,11 +23,15 @@ The function assumes that the CONFOR program executable is available
 in the system PATH or in the current working directory.
 }
 \examples{
+# Requires the CONFOR executable on the PATH.
 \donttest{
-# Load a DELTA dataset
-delta <- load_delta("chars_viola", "items_viola", "specs_viola")
-
-# Check characters and items
-check(delta)
+try({
+  delta <- load_delta(
+    system.file("extdata", "chars_viola", package = "RDelta"),
+    system.file("extdata", "items_viola", package = "RDelta"),
+    system.file("extdata", "specs_viola", package = "RDelta")
+  )
+  check(delta)
+})
 }
 }

@@ -6,14 +6,9 @@
 #' @docType package
 #' @name RDelta-package
 #' @aliases RDelta
+#' @return No return value; this is a package-level documentation object.
 #' @keywords internal
 "_PACKAGE"
-
-# REMOVE this section or comment it out:
-# @section Important Classes:
-# \describe{
-#   \item{\code{\linkS4class{Rcpp_DeltaParser}}}{Main parser class for DELTA files}
-# }
 
 .onLoad <- function(libname, pkgname) {
   tryCatch({

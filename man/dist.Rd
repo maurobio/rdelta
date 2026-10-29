@@ -50,15 +50,17 @@ The function assumes that the CONFOR and DIST program executables are available
 in the system PATH or in the current working directory.
 }
 \examples{
+# Requires the CONFOR and DIST executables on the PATH.
 \donttest{
-# Load a DELTA dataset
-delta <- load_delta("chars", "items", "specs")
-
-# Generate distance matrix
-dist(delta)
-
-# With custom options
-dist(delta, match_overlap = TRUE, phylip_format = TRUE,
-     minimum_comparisons = 10)
+try({
+  delta <- load_delta(
+    system.file("extdata", "chars_viola", package = "RDelta"),
+    system.file("extdata", "items_viola", package = "RDelta"),
+    system.file("extdata", "specs_viola", package = "RDelta")
+  )
+  dist(delta)
+  dist(delta, match_overlap = TRUE, phylip_format = TRUE,
+       minimum_comparisons = 10)
+})
 }
 }

@@ -1,20 +1,17 @@
-# R/globals.R
-#' Parse DELTA Attribute
-#'
-#' Internal function to parse DELTA attributes from the C++ module.
-#' @param x Character string to parse
+# R/globals.R - Internal module wrappers
+
+#' Internal wrapper for module parse_delta_attribute
 #' @keywords internal
-parse_delta_attribute <- function(x) {
+#' @noRd
+.parse_delta_attribute <- function(x) {
   delta_module <- get("delta_module", envir = .GlobalEnv)
   delta_module$parse_delta_attribute(x)
 }
 
-#' Strip DELTA Comments
-#'
-#' Internal function to strip comments from DELTA format.
-#' @param x Character string to strip comments from
+#' Internal wrapper for module strip_delta_comments
 #' @keywords internal
-strip_delta_comments <- function(x) {
+#' @noRd
+.strip_delta_comments <- function(x) {
   delta_module <- get("delta_module", envir = .GlobalEnv)
   delta_module$strip_delta_comments(x)
 }

@@ -142,16 +142,22 @@
 #'
 #' @examples
 #' \donttest{
-#' delta <- load_delta("chars", "items", "specs")
+#' try({
+#'   delta <- load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   )
 #'
-#' # Write to a temporary directory
-#' save_delta(delta, dir = tempdir())
+#'   # Write to a temporary directory
+#'   save_delta(delta, dir = tempdir())
 #'
-#' # Write to a user-chosen directory with a prefix
-#' save_delta(delta, dir = tempdir(), prefix = "my_", overwrite = TRUE)
+#'   # Write to a user-chosen directory with a prefix
+#'   save_delta(delta, dir = tempdir(), prefix = "my_", overwrite = TRUE)
 #'
-#' # Use a wider output width
-#' save_delta(delta, dir = tempdir(), width = 120)
+#'   # Use a wider output width
+#'   save_delta(delta, dir = tempdir(), width = 120)
+#' })
 #' }
 save_delta <- function(delta, dir, prefix = "", overwrite = FALSE, width = 79) {
   # Check if it's a DeltaParser object

@@ -14,12 +14,16 @@
 #'          in the system PATH or in the current working directory.
 #'
 #' @examples
+#' # Requires the CONFOR executable on the PATH.
 #' \donttest{
-#' # Load a DELTA dataset
-#' delta <- load_delta("chars", "items", "specs")
-#'
-#' # Convert to SLIKS format
-#' delta2sliks(delta, output_file = file.path(tempdir(), "data.js"))
+#' try({
+#'   delta <- load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   )
+#'   delta2sliks(delta, output_file = file.path(tempdir(), "data.js"))
+#' })
 #' }
 delta2sliks <- function(delta, output_file = "data.js",
                         exclude_numeric = TRUE, remove_temp = TRUE) {
@@ -90,8 +94,9 @@ delta2sliks <- function(delta, output_file = "data.js",
           file = con_in)
       cat("*LISTING FILE delchars.lst\n\n", file = con_in)
 
+      # Paths must be quoted to survive spaces in the path
       if (!is.null(specs_file) && file.exists(specs_file)) {
-        cat("*INPUT FILE ", specs_file, "\n\n", sep = "", file = con_in)
+        cat('*INPUT FILE "', specs_file, '"\n\n', sep = "", file = con_in)
       }
 
       cat("*EXCLUDE CHARACTERS ", paste(excluded, collapse = " "), "\n\n",
@@ -101,11 +106,11 @@ delta2sliks <- function(delta, output_file = "data.js",
       cat("*OUTPUT PARAMETERS\n", file = con_in)
       cat("#SHOW ", title, "\n\n", sep = "", file = con_in)
       cat("#CHARACTER LIST\n", file = con_in)
-      cat("*INPUT FILE ", chars_file, "\n\n", sep = "", file = con_in)
+      cat('*INPUT FILE "', chars_file, '"\n\n', sep = "", file = con_in)
       cat("*OUTPUT FILE items.new\n", file = con_in)
       cat("*OUTPUT PARAMETERS\n\n", file = con_in)
       cat("#ITEM DESCRIPTIONS\n", file = con_in)
-      cat("*INPUT FILE ", items_file, "\n", sep = "", file = con_in)
+      cat('*INPUT FILE "', items_file, '"\n', sep = "", file = con_in)
       close(con_in)
 
       # Run CONFOR
@@ -146,7 +151,7 @@ delta2sliks <- function(delta, output_file = "data.js",
   num_items <- conv_delta$get_items_nb()
 
   # Parse attribute helper function
-  parse_attribute <- function(input) {
+  parse_attribute_local <- function(input) {
     commaPos <- regexpr(",", input, fixed = TRUE)[1]
     if (commaPos != -1) {
       attributeValue <- substr(input, commaPos + 1, nchar(input))
@@ -165,9 +170,8 @@ delta2sliks <- function(delta, output_file = "data.js",
     file.path(old_wd, output_file)
   }
 
-  # Write SLIKS output
+  # Write SLIKS output; open and close locally, no on.exit
   outfile <- file(basename(out_path), "w")
-  on.exit(close(outfile), add = TRUE)
 
   # Write header
   cat("var dataset = \"<h2>", title, "</h2>\"\n\n", sep = "", file = outfile)
@@ -203,12 +207,12 @@ delta2sliks <- function(delta, output_file = "data.js",
   cat("\n\nvar items = [ [\"\"],\n", file = outfile)
   for (i in 1:num_items) {
     # Get item name
-    item_name <- conv_delta$get_item_name(i)
-    item_name <- trimws(item_name)
+    item_name_val <- conv_delta$get_item_name(i)
+    item_name_val <- trimws(item_name_val)
     # Escape quotes in item name
-    item_name <- gsub("\"", "\\\"", item_name, fixed = TRUE)
+    item_name_val <- gsub("\"", "\\\"", item_name_val, fixed = TRUE)
 
-    cat("\t[\"", item_name, "\", ", sep = "", file = outfile)
+    cat("\t[\"", item_name_val, "\", ", sep = "", file = outfile)
 
     # Get attributes for this item
     num_attrs <- conv_delta$get_attributes_nb(i)
@@ -216,7 +220,7 @@ delta2sliks <- function(delta, output_file = "data.js",
     if (num_attrs > 0) {
       for (j in 1:num_attrs) {
         attr_val <- conv_delta$get_attribute(i, j)
-        parsed_val <- parse_attribute(attr_val)
+        parsed_val <- parse_attribute_local(attr_val)
 
         if (j < num_attrs) {
           cat("\"", parsed_val, "\",", sep = "", file = outfile)

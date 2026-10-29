@@ -17,7 +17,13 @@ Get all dependency relationships
 }
 \examples{
 \donttest{
-delta <- load_delta("chars", "items", "specs")
-get_all_dependencies(delta)
+try({
+  delta <- load_delta(
+    system.file("extdata", "chars_viola", package = "RDelta"),
+    system.file("extdata", "items_viola", package = "RDelta"),
+    system.file("extdata", "specs_viola", package = "RDelta")
+  )
+  get_all_dependencies(delta)
+})
 }
 }

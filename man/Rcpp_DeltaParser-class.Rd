@@ -4,6 +4,10 @@
 \alias{Rcpp_DeltaParser-class}
 \alias{Rcpp_DeltaParser}
 \title{Rcpp_DeltaParser Class}
+\value{
+An object of class \code{Rcpp_DeltaParser} representing a parsed
+DELTA dataset.
+}
 \description{
 Internal class for DELTA parser objects from the C++ module.
 }

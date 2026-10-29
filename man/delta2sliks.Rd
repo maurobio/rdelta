@@ -32,11 +32,15 @@ The function assumes that the CONFOR program executable is available
 in the system PATH or in the current working directory.
 }
 \examples{
+# Requires the CONFOR executable on the PATH.
 \donttest{
-# Load a DELTA dataset
-delta <- load_delta("chars", "items", "specs")
-
-# Convert to SLIKS format
-delta2sliks(delta, output_file = file.path(tempdir(), "data.js"))
+try({
+  delta <- load_delta(
+    system.file("extdata", "chars_viola", package = "RDelta"),
+    system.file("extdata", "items_viola", package = "RDelta"),
+    system.file("extdata", "specs_viola", package = "RDelta")
+  )
+  delta2sliks(delta, output_file = file.path(tempdir(), "data.js"))
+})
 }
 }

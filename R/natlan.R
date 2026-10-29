@@ -31,21 +31,24 @@
 #'
 #' @details The function assumes that the CONFOR program executable is available
 #'          in the system PATH or in the current working directory.
+#'
 #' @examples
+#' # Requires the CONFOR executable on the PATH.
 #' \donttest{
-#' # Load a DELTA dataset
-#' delta <- load_delta("chars_viola", "items_viola", "specs_viola")
-#'
-#' # Generate natural language descriptions
-#' natlan(delta)
-#'
-#' # With custom heading and subheadings
-#' natlan(delta,
-#'        heading = "Flora of Region X - species descriptions",
-#'        item_subheadings = list(
-#'          "87" = "Transverse section of lamina",
-#'          "96" = "Leaf epidermis"
-#'        ))
+#' try({
+#'   delta <- load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   )
+#'   natlan(delta)
+#'   natlan(delta,
+#'          heading = "Flora of Region X - species descriptions",
+#'          item_subheadings = list(
+#'            "87" = "Transverse section of lamina",
+#'            "96" = "Leaf epidermis"
+#'          ))
+#' })
 #' }
 natlan <- function(delta,
                    heading = NULL,
@@ -121,9 +124,9 @@ natlan <- function(delta,
   cat("*PRINT FILE description.txt\n", file = con_in)
   cat("\n", file = con_in)
 
-  # 2. INPUT FILE specs (must come before TRANSLATE)
+  # 2. INPUT FILE specs (must come before TRANSLATE; path quoted)
   if (!is.null(specs_file) && file.exists(specs_file)) {
-    cat("*INPUT FILE ", specs_file, "\n", sep = "", file = con_in)
+    cat('*INPUT FILE "', specs_file, '"\n', sep = "", file = con_in)
     cat("\n", file = con_in)
   }
 
@@ -169,7 +172,6 @@ natlan <- function(delta,
 
   # Use custom vocabulary or default
   if (!is.null(vocabulary)) {
-    # Validate custom vocabulary
     if (!is.list(vocabulary) || is.null(names(vocabulary))) {
       stop("vocabulary must be a named list")
     }
@@ -177,26 +179,10 @@ natlan <- function(delta,
       cat("#", names(vocabulary)[i], ". ", vocabulary[[i]], "\n", sep = "", file = con_in)
     }
   } else {
-    # Default vocabulary
     default_vocab <- c(
-      "or",
-      "to",
-      "and",
-      "variable",
-      "unknown",
-      "not applicable",
-      "(variant)",
-      "not coded",
-      "never",
-      "minimum",
-      "maximum",
-      "up to",
-      "or more",
-      ".",
-      ",",
-      ", <alternate comma>",
-      ";",
-      "."
+      "or", "to", "and", "variable", "unknown", "not applicable",
+      "(variant)", "not coded", "never", "minimum", "maximum",
+      "up to", "or more", ".", ",", ", <alternate comma>", ";", "."
     )
     for (i in seq_along(default_vocab)) {
       cat("#", i, ". ", default_vocab[i], "\n", sep = "", file = con_in)
@@ -205,9 +191,8 @@ natlan <- function(delta,
 
   cat("\n", file = con_in)
 
-  # 6. Additional directives (ITEM SUBHEADINGS, LINK CHARACTERS, etc.)
+  # 6. Additional directives
 
-  # Add item subheadings if provided
   if (!is.null(item_subheadings)) {
     if (!is.list(item_subheadings)) {
       stop("item_subheadings must be a list")
@@ -219,7 +204,6 @@ natlan <- function(delta,
     cat("\n", file = con_in)
   }
 
-  # Add link characters if provided
   if (!is.null(link_characters)) {
     if (!is.list(link_characters)) {
       stop("link_characters must be a list")
@@ -231,7 +215,6 @@ natlan <- function(delta,
     cat("\n", file = con_in)
   }
 
-  # Add omit lower for characters
   if (!is.null(omit_lower_for_characters)) {
     if (!is.character(omit_lower_for_characters)) {
       stop("omit_lower_for_characters must be a character vector")
@@ -240,7 +223,6 @@ natlan <- function(delta,
         "\n\n", sep = "", file = con_in)
   }
 
-  # Add omit or for characters
   if (!is.null(omit_or_for_characters)) {
     if (!is.character(omit_or_for_characters)) {
       stop("omit_or_for_characters must be a character vector")
@@ -249,7 +231,6 @@ natlan <- function(delta,
         "\n\n", sep = "", file = con_in)
   }
 
-  # Add omit period for characters
   if (!is.null(omit_period_for_characters)) {
     if (!is.character(omit_period_for_characters)) {
       stop("omit_period_for_characters must be a character vector")
@@ -258,7 +239,6 @@ natlan <- function(delta,
         "\n\n", sep = "", file = con_in)
   }
 
-  # Add new paragraphs at characters
   if (!is.null(new_paragraphs_at_characters)) {
     if (!is.character(new_paragraphs_at_characters)) {
       stop("new_paragraphs_at_characters must be a character vector")
@@ -267,7 +247,6 @@ natlan <- function(delta,
         "\n\n", sep = "", file = con_in)
   }
 
-  # Add replace semicolon by comma
   if (!is.null(replace_semicolon_by_comma)) {
     if (!is.character(replace_semicolon_by_comma)) {
       stop("replace_semicolon_by_comma must be a character vector")
@@ -276,12 +255,10 @@ natlan <- function(delta,
         "\n\n", sep = "", file = con_in)
   }
 
-  # Add translate implicit values
   if (translate_implicit_values) {
     cat("*TRANSLATE IMPLICIT VALUES\n\n", file = con_in)
   }
 
-  # Add exclude items
   if (!is.null(exclude_items) && length(exclude_items) > 0) {
     item_exclusions <- character()
     for (item in exclude_items) {
@@ -302,7 +279,6 @@ natlan <- function(delta,
     }
   }
 
-  # Add exclude characters
   if (!is.null(exclude_characters) && length(exclude_characters) > 0) {
     char_exclusions <- character()
     for (char in exclude_characters) {
@@ -323,12 +299,12 @@ natlan <- function(delta,
     }
   }
 
-  # 7. INPUT FILE chars and items (must come after all translation directives)
-  cat("*INPUT FILE ", chars_file, "\n", sep = "", file = con_in)
+  # 7. INPUT FILE chars and items (paths quoted)
+  cat('*INPUT FILE "', chars_file, '"\n', sep = "", file = con_in)
   cat("\n", file = con_in)
   cat("*PRINT HEADING\n", file = con_in)
   cat("\n", file = con_in)
-  cat("*INPUT FILE ", items_file, "\n", sep = "", file = con_in)
+  cat('*INPUT FILE "', items_file, '"\n', sep = "", file = con_in)
 
   close(con_in)
 
@@ -344,20 +320,16 @@ natlan <- function(delta,
     stop("Error: CONFOR execution failed!")
   }
 
-  # Check if description file was created
   output_file <- "description.txt"
   if (!file.exists(output_file)) {
     stop("Error: Description file (description.txt) not created!")
   }
 
-  # Read the generated descriptions
   descriptions <- readLines(output_file)
 
-  # Copy the output file to the user's working directory before cleanup
   out_path <- file.path(old_wd, "description.txt")
   file.copy(output_file, out_path, overwrite = TRUE)
 
-  # Clean up temporary files (but keep the output file)
   if (remove_temp) {
     if (file.exists(con_file)) unlink(con_file)
     if (file.exists(paste0(con_file, ".lst"))) unlink(paste0(con_file, ".lst"))

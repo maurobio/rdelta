@@ -4,6 +4,10 @@
 \alias{C++Object-class}
 \alias{C++Object}
 \title{C++Object Class}
+\value{
+An object of class \code{C++Object} wrapping a pointer to a C++
+instance.
+}
 \description{
 Internal class for managing C++ objects in R.
 }

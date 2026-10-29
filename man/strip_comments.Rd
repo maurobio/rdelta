@@ -10,7 +10,8 @@ strip_comments(src)
 \item{src}{A string with DELTA comments}
 }
 \value{
-String with all comments removed
+A character string with all DELTA comments (delimited by
+\code{<} and \code{>}) removed.
 }
 \description{
 Remove comments from a DELTA string

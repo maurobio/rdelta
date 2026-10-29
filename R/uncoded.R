@@ -11,42 +11,37 @@
 #' @return Invisibly returns the path to the generated uncoded characters file
 #' @export
 #'
-#' @details The function assumes that the CONFOR program executable is available 
+#' @details The function assumes that the CONFOR program executable is available
 #'          in the system PATH or in the current working directory.
 #'
 #' @examples
+#' # Requires the CONFOR executable on the PATH.
 #' \donttest{
-#' # Load a DELTA dataset
-#' delta <- load_delta("chars_viola", "items_viola", "specs_viola")
-#' 
-#' # Generate list of uncoded characters
-#' uncoded(delta)
-#' 
-#' # With custom heading
-#' uncoded(delta, heading = "Genre Viola - Missing data report")
+#' try({
+#'   delta <- load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   )
+#'   uncoded(delta)
+#'   uncoded(delta, heading = "Genre Viola - Missing data report")
+#' })
 #' }
 uncoded <- function(delta, heading = NULL, remove_temp = TRUE) {
-  
-  # Validate input - consistent with other RDelta functions
+
   if (!inherits(delta, "Rcpp_DeltaParser") && !inherits(delta, "DeltaParser")) {
     stop("'delta' must be a DeltaParser object created by load_delta()")
   }
-  
+
   if (!(delta$is_parsed() && delta$is_items_parsed())) {
     stop("Error: Delta dataset not properly parsed")
   }
-  
-  # Get file information
+
   chars_file <- delta$get_filename()
   items_file <- delta$get_items_filename()
   has_specs <- delta$has_specifications()
   specs_file <- if (has_specs) delta$get_specs_filename() else NULL
-  
-  # Get counts
-  num_chars <- delta$get_chars_nb()
-  num_items <- delta$get_items_nb()
-  
-  # Get heading
+
   heading_text <- "Uncoded characters report"
   if (!is.null(heading)) {
     heading_text <- heading
@@ -59,67 +54,63 @@ uncoded <- function(delta, heading = NULL, remove_temp = TRUE) {
       }
     }
   }
-  
-  # Create timestamp for the output
+
   timestamp <- format(Sys.time(), "%d/%m/%Y %H:%M:%S")
-  
-  # --- Create CONFOR directives file ---
+
+  tmp_dir <- file.path(tempdir(), paste0("RDelta_uncoded_", Sys.getpid()))
+  dir.create(tmp_dir, showWarnings = FALSE, recursive = TRUE)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+
+  old_wd <- setwd(tmp_dir)
+  on.exit(setwd(old_wd), add = TRUE)
+
   directives_file <- "uncoded.drt"
   con_in <- file(directives_file, "w")
-  
-  # 1. SHOW and HEADING directives
+
   cat("*SHOW Print uncoded characters\n", file = con_in)
   cat("*SHOW Generated on ", timestamp, "\n", sep = "", file = con_in)
   cat("*HEADING ", heading_text, "\n", sep = "", file = con_in)
   cat("*PRINT FILE uncoded.txt\n", file = con_in)
   cat("\n", file = con_in)
-  
-  # 2. INPUT FILE specs (if available)
+
   if (!is.null(specs_file) && file.exists(specs_file)) {
-    cat("*INPUT FILE ", specs_file, "\n", sep = "", file = con_in)
+    cat('*INPUT FILE "', specs_file, '"\n', sep = "", file = con_in)
     cat("\n", file = con_in)
   }
-  
-  # 3. PRINT UNCODED CHARACTERS directive
+
   cat("*PRINT UNCODED CHARACTERS\n", file = con_in)
   cat("\n", file = con_in)
-  
-  # 4. INPUT FILE chars
-  cat("*INPUT FILE ", chars_file, "\n", sep = "", file = con_in)
+
+  cat('*INPUT FILE "', chars_file, '"\n', sep = "", file = con_in)
   cat("\n", file = con_in)
-  
-  # 5. INPUT FILE items
-  cat("*INPUT FILE ", items_file, "\n", sep = "", file = con_in)
-  
+
+  cat('*INPUT FILE "', items_file, '"\n', sep = "", file = con_in)
+
   close(con_in)
-  
-  # Run CONFOR
+
   if (Sys.info()["sysname"] == "Windows") {
     result <- system(paste("confor", directives_file))
   } else {
     confor_cmd <- if (file.exists("./confor")) "./confor" else "confor"
     result <- system(paste(confor_cmd, directives_file))
   }
-  
+
   if (result != 0) {
     stop("Error: CONFOR execution failed!")
   }
-  
-  # Check if output file was created
+
   output_file <- "uncoded.txt"
   if (!file.exists(output_file)) {
     stop("Error: Uncoded characters file (uncoded.txt) not created!")
   }
-  
-  # Read the generated output
-  uncoded_text <- readLines(output_file)
-  
-  # Clean up temporary files
+
+  out_path <- file.path(old_wd, "uncoded.txt")
+  file.copy(output_file, out_path, overwrite = TRUE)
+
   if (remove_temp) {
     if (file.exists(directives_file)) unlink(directives_file)
     if (file.exists(paste0(directives_file, ".lst"))) unlink(paste0(directives_file, ".lst"))
-    # Keep uncoded.txt as the output file
   }
-    
-  invisible(output_file)
+
+  invisible(out_path)
 }

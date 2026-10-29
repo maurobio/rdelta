@@ -13,6 +13,10 @@ set_char_type(delta, charnum, chartype)
 
 \item{chartype}{Integer character type code}
 }
+\value{
+No return value, called for side effects. The character type of
+\code{charnum} is modified in \code{delta} in place.
+}
 \description{
 Set character type
 }

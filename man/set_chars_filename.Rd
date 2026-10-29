@@ -13,6 +13,10 @@ set_chars_filename(delta, fname, parse = TRUE)
 
 \item{parse}{Logical, parse the file immediately}
 }
+\value{
+No return value, called for side effects. The characters filename
+stored in \code{delta} is updated.
+}
 \description{
 Set characters filename
 }

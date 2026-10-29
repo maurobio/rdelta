@@ -25,16 +25,18 @@
 #'          in the system PATH or in the current working directory.
 #'
 #' @examples
+#' # Requires the CONFOR and DIST executables on the PATH.
 #' \donttest{
-#' # Load a DELTA dataset
-#' delta <- load_delta("chars", "items", "specs")
-#'
-#' # Generate distance matrix
-#' dist(delta)
-#'
-#' # With custom options
-#' dist(delta, match_overlap = TRUE, phylip_format = TRUE,
-#'      minimum_comparisons = 10)
+#' try({
+#'   delta <- load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   )
+#'   dist(delta)
+#'   dist(delta, match_overlap = TRUE, phylip_format = TRUE,
+#'        minimum_comparisons = 10)
+#' })
 #' }
 dist <- function(delta,
                  heading = NULL,
@@ -105,9 +107,9 @@ dist <- function(delta,
   cat("*SHOW Generated on ", format(Sys.time(), "%d/%m/%Y %H:%M:%S"), "\n\n", sep = "", file = con_in)
   cat("*HEADING ", heading_text, "\n\n", sep = "", file = con_in)
 
-  # Include specifications file if it exists
+  # Include specifications file if it exists (path quoted to allow spaces)
   if (!is.null(specs_file) && file.exists(specs_file)) {
-    cat("*INPUT FILE ", specs_file, "\n\n", sep = "", file = con_in)
+    cat('*INPUT FILE "', specs_file, '"\n\n', sep = "", file = con_in)
   }
 
   cat("*OMIT TYPESETTING MARKS\n", file = con_in)
@@ -161,7 +163,7 @@ dist <- function(delta,
 
   cat("*TRANSLATE INTO DISTANCE FORMAT\n", file = con_in)
   cat("*DIST OUTPUT FILE ditems\n", file = con_in)
-  cat("*INPUT FILE ", items_file, "\n", sep = "", file = con_in)
+  cat('*INPUT FILE "', items_file, '"\n', sep = "", file = con_in)
 
   close(con_in)
 

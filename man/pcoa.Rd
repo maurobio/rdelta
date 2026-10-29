@@ -31,14 +31,18 @@ by the dist() function. This function reads the distance matrix and item names
 from the DIST output files and creates a PCoA scatterplot.
 }
 \examples{
+# Requires the CONFOR and DIST executables on the PATH.
 \donttest{
-# First generate a distance matrix
-delta <- load_delta("chars", "items", "specs")
-dist(delta)
-
-# Then perform PCoA
-res <- pcoa(delta$get_items_nb())
-res$variance      # variance explained by axes 1 and 2
-res$cumulative    # cumulative variance of axes 1 and 2
+try({
+  delta <- load_delta(
+    system.file("extdata", "chars_viola", package = "RDelta"),
+    system.file("extdata", "items_viola", package = "RDelta"),
+    system.file("extdata", "specs_viola", package = "RDelta")
+  )
+  dist(delta)
+  res <- pcoa(delta$get_items_nb())
+  res$variance
+  res$cumulative
+})
 }
 }

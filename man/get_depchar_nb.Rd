@@ -27,7 +27,13 @@ Get number of dependent characters
 }
 \examples{
 \donttest{
-delta <- load_delta("chars", "items", "specs")
-get_depchar_nb(delta, 13, 2)
+try({
+  delta <- load_delta(
+    system.file("extdata", "chars_viola", package = "RDelta"),
+    system.file("extdata", "items_viola", package = "RDelta"),
+    system.file("extdata", "specs_viola", package = "RDelta")
+  )
+  get_depchar_nb(delta, 13, 2)
+})
 }
 }

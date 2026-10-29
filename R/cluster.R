@@ -24,15 +24,19 @@
 #' @export
 #'
 #' @examples
+#' # Requires the CONFOR and DIST executables on the PATH.
 #' \donttest{
-#' # First generate a distance matrix
-#' delta <- load_delta("chars", "items", "specs")
-#' dist(delta)
-#'
-#' # Then perform cluster analysis
-#' res <- cluster(delta$get_items_nb())
-#' res$cophenetic   # cophenetic correlation coefficient
-#' res <- cluster(delta$get_items_nb(), method = "complete")
+#' try({
+#'   delta <- load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   )
+#'   dist(delta)
+#'   res <- cluster(delta$get_items_nb())
+#'   res$cophenetic
+#'   res <- cluster(delta$get_items_nb(), method = "complete")
+#' })
 #' }
 cluster <- function(notu, method = "average") {
   # Validate input

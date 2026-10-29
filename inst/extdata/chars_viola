@@ -1,0 +1,143 @@
+*SHOW Genre Viola - Liste des caracteres
+*SHOW Denis ZIEGLER - Novembre 1998
+ 
+*CHARACTER LIST 
+ 
+#1. fleurs <position des petales>/
+	1. de type violette <2 petales dresses et 3 vers le bas>/
+	2. de type pensee <4 petales dresses et 1 vers le bas>/
+ 
+#2. petales <couleur>/
+	1. violet/
+	2. bleu/
+	3. bleu pale, lilas/
+	4. blanc/
+	5. jaune/
+	6. bi ou tricolore/
+ 
+#3. fleurs <odorantes ou inodores>/
+	1. odorantes/
+	2. inodores/
+
+#4. taille des fleurs/ mm/
+
+#5. eperon <forme>/
+	1. droit/
+	2. recourbe, bifide/
+
+#6. extremite de l'eperon/
+	1. obtus/
+	2. aigu/
+
+#7. eperon <taille par rapport aux appendices des sepales>/
+	1. ne depassant pas les appendices/
+	2. depassant les appendices/
+
+#8. eperon <couleur>/
+	1. violet/
+	2. bleu/
+	3. jaunatre, blanchatre/
+
+#9. sepales <forme>/
+	1. ovales-obtus/
+	2. lanceoles-aigus/
+
+#10. appendices des sepales <taille>/
+	1. grands (2-3 mm)/
+	2. tres courts/
+
+#11. stigmate <forme>/
+	1. en crochet aigu/
+	2. epais, tronque/
+	3. en entonnoir/
+
+#12. capsules <pilosite>/
+	1. glabres/
+	2. velues/
+
+#13. <presence ou absence de tiges>/
+	1. presence de tiges/
+	2. pas de tiges/
+
+#14. tiges <mode d'insertion>/
+	1. inserees a l'aisselle des feuilles inferieures/
+	2. directement sur la souche/
+
+#15. tiges <developpees a la floraison>/
+	1. developpees a la floraison/
+	2. non developpees a la floraison/
+
+#16. souche <grele ou epaisse>/
+	1. grele/
+	2. epaisse/
+
+#17. <presence ou absence de stolons>/
+	1. presence de stolons/
+	2. pas de stolons/
+
+#18. <presence ou absence de rhizomes>/
+	1. presence de rhizomes/
+	2. pas de rhizomes/
+
+#19. rosette de feuilles/
+	1. presente/
+	2. absente/
+
+#20. feuilles <forme>/
+	1. ovales, lanceolees/
+	2. arrondies ou en coeur a la base/
+
+#21. feuilles <bordure>/
+	1. entieres/
+	2. crenelees/
+	3. dentees/
+	4. divisees/
+
+#22. feuilles <rapport longueur/largeur>/
+	1. plus longues que larges/
+	2. aussi larges que longues/
+	3. plus larges que longues/
+
+#23. feuilles <luisantes ou mates>/
+	1. luisantes/
+	2. mates/
+
+#24. limbe <se prolongeant ou non le long du petiole>/
+	1. se prolongeant le long du petiole/
+	2. ne se prolongeant pas le long du petiole/
+
+#25. stipules <forme>/
+	1. ovales/
+	2. lanceolees, lineaires/
+
+#26. stipules <bordure>/
+	1. entieres/
+	2. dentees ou frangees/
+	3. profondement divisees/
+
+#27. stipules <ciliees ou non>/
+	1. non ciliees/
+	2. avec cils simples/
+	3. avec cils glanduleux/
+
+#28. stipules <par rapport aux feuilles>/
+	1. differentes des feuilles/
+	2. semblables aux feuilles/
+
+#29. stipules <taille par rapport au petiole>/
+	1. de 1/6 a 1/3 de la longueur du petiole/
+	2. de 1/3 a 1/2 de la longueur du petiole/
+	3. de 1/2 a la longueur du petiole/
+	4. depassant le petiole/
+
+#30. plante <pilosite>/
+	1. glabre/
+	2. plus ou moins velue/
+
+#31. taille de la plante/ cm/
+
+#32. plante <duree de vie>/
+	1. annuelle ou bisannuelle/
+	2. vivace/
+
+

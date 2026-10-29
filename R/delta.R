@@ -31,15 +31,23 @@
 #' @param specs_file Optional path to the DELTA specifications file
 #' @return A DeltaParser Rcpp module object
 #' @export
+#'
+#' @examples
+#' # Load the packaged example dataset
+#' delta <- tryCatch(
+#'   load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   ),
+#'   error = function(e) NULL
+#' )
+#'
+#' if (!is.null(delta)) {
+#'   char_count(delta)
+#'   char_feature(delta, 1)
+#' }
 load_delta <- function(chars_file, items_file, specs_file = NULL) {
-  if (!exists("DeltaParser")) {
-    tryCatch({
-      loadModule("delta_module", TRUE)
-    }, error = function(e) {
-      stop("DeltaParser module not found. Please reinstall the package.")
-    })
-  }
-  
   if (!file.exists(chars_file)) {
     stop("Characters file not found: ", chars_file)
   }
@@ -88,7 +96,7 @@ characters_df <- function(delta) {
     unit = sapply(seq_len(n), function(i) delta$get_char_unit(i)),
     states = I(lapply(seq_len(n), function(i) {
       if (delta$get_char_type(i) %in% c(2, 3)) {
-        sapply(seq_len(delta$get_states_nb(i)), 
+        sapply(seq_len(delta$get_states_nb(i)),
                function(j) delta$get_state(i, j))
       } else {
         character(0)
@@ -111,7 +119,7 @@ items_df <- function(delta, include_comments = FALSE) {
   n <- delta$get_items_nb()
   data.frame(
     number = seq_len(n),
-    name = sapply(seq_len(n), function(i) delta$get_item_name(i, include_comments)),
+    name = sapply(seq_len(n), function(i) item_name(delta, i, include_comments)),
     attribute_count = sapply(seq_len(n), function(i) delta$get_attributes_nb(i)),
     stringsAsFactors = FALSE
   )
@@ -127,7 +135,11 @@ items_df <- function(delta, include_comments = FALSE) {
 #' @return A list with item name and attributes
 #' @export
 get_item <- function(delta, itemnum, include_comments = FALSE) {
-  delta$get_item_data(itemnum, include_comments)
+  if (isTRUE(include_comments)) {
+    delta$get_item_data_comments(itemnum, TRUE)
+  } else {
+    delta$get_item_data(itemnum)
+  }
 }
 
 #------------------------------------------------------------------------------
@@ -139,6 +151,17 @@ get_item <- function(delta, itemnum, include_comments = FALSE) {
 #' @param delta A DeltaParser object
 #' @return Integer number of characters
 #' @export
+#'
+#' @examples
+#' delta <- tryCatch(
+#'   load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   ),
+#'   error = function(e) NULL
+#' )
+#' if (!is.null(delta)) char_count(delta)
 char_count <- function(delta) {
   delta$get_chars_nb()
 }
@@ -149,6 +172,17 @@ char_count <- function(delta) {
 #' @param charnum Character number
 #' @return Character string with the feature description
 #' @export
+#'
+#' @examples
+#' delta <- tryCatch(
+#'   load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   ),
+#'   error = function(e) NULL
+#' )
+#' if (!is.null(delta)) char_feature(delta, 1)
 char_feature <- function(delta, charnum) {
   delta$get_char_feature(charnum)
 }
@@ -219,6 +253,8 @@ states <- function(delta, charnum) {
 #' @param delta A DeltaParser object
 #' @param charnum Character number
 #' @param chartype Integer character type code
+#' @return No return value, called for side effects. The character type of
+#'   \code{charnum} is modified in \code{delta} in place.
 #' @export
 set_char_type <- function(delta, charnum, chartype) {
   delta$set_char_type(charnum, chartype)
@@ -229,6 +265,8 @@ set_char_type <- function(delta, charnum, chartype) {
 #' @param delta A DeltaParser object
 #' @param charnum Character number
 #' @param type_name Character type name
+#' @return No return value, called for side effects. The character type of
+#'   \code{charnum} is modified in \code{delta} in place.
 #' @export
 set_char_type_by_name <- function(delta, charnum, type_name) {
   delta$set_char_type_by_name(charnum, type_name)
@@ -257,9 +295,11 @@ is_chars_parsed <- function(delta) {
 #' @param delta A DeltaParser object
 #' @param fname New filename
 #' @param parse Logical, parse the file immediately
+#' @return No return value, called for side effects. The characters filename
+#'   stored in \code{delta} is updated.
 #' @export
 set_chars_filename <- function(delta, fname, parse = TRUE) {
-  delta$set_filename(fname, parse)
+  set_filename(delta, fname, parse)
 }
 
 #' Parse characters file
@@ -367,9 +407,15 @@ is_parsed <- function(delta) {
 #' @param delta A DeltaParser object
 #' @param fname New filename
 #' @param parse Logical, parse the file immediately
+#' @return No return value, called for side effects. The characters filename
+#'   stored in \code{delta} is updated.
 #' @export
 set_filename <- function(delta, fname, parse = TRUE) {
-  delta$set_filename(fname, parse)
+  if (isTRUE(parse)) {
+    delta$set_filename_parse(fname, TRUE)
+  } else {
+    delta$set_filename(fname)
+  }
 }
 
 #------------------------------------------------------------------------------
@@ -381,6 +427,17 @@ set_filename <- function(delta, fname, parse = TRUE) {
 #' @param delta A DeltaParser object
 #' @return Integer number of items
 #' @export
+#'
+#' @examples
+#' delta <- tryCatch(
+#'   load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   ),
+#'   error = function(e) NULL
+#' )
+#' if (!is.null(delta)) item_count(delta)
 item_count <- function(delta) {
   delta$get_items_nb()
 }
@@ -392,8 +449,23 @@ item_count <- function(delta) {
 #' @param include_comments Logical; if TRUE, include comments in item names
 #' @return Character string with item name
 #' @export
+#'
+#' @examples
+#' delta <- tryCatch(
+#'   load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   ),
+#'   error = function(e) NULL
+#' )
+#' if (!is.null(delta)) item_name(delta, 1)
 item_name <- function(delta, itemnum, include_comments = TRUE) {
-  delta$get_item_name(itemnum, include_comments)
+  if (isTRUE(include_comments)) {
+    delta$item_name_comments(itemnum, TRUE)
+  } else {
+    delta$item_name(itemnum)
+  }
 }
 
 #' Get all item names
@@ -403,7 +475,11 @@ item_name <- function(delta, itemnum, include_comments = TRUE) {
 #' @return Character vector of item names
 #' @export
 item_names <- function(delta, include_comments = FALSE) {
-  delta$get_item_names(include_comments)
+  if (isTRUE(include_comments)) {
+    delta$item_names_comments(TRUE)
+  } else {
+    delta$item_names()
+  }
 }
 
 #' Get number of attributes for an item
@@ -445,7 +521,11 @@ item_attributes <- function(delta, itemnum) {
 #' @return List with item data
 #' @export
 item_data <- function(delta, itemnum, include_comments = FALSE) {
-  delta$get_item_data(itemnum, include_comments)
+  if (isTRUE(include_comments)) {
+    delta$item_data_comments(itemnum, TRUE)
+  } else {
+    delta$item_data(itemnum)
+  }
 }
 
 #' Get items filename
@@ -471,9 +551,11 @@ is_items_parsed <- function(delta) {
 #' @param delta A DeltaParser object
 #' @param fname New filename
 #' @param parse Logical, parse the file immediately
+#' @return No return value, called for side effects. The items filename stored
+#'   in \code{delta} is updated.
 #' @export
 set_items_file <- function(delta, fname, parse = TRUE) {
-  delta$set_items_filename(fname, parse)
+  set_items_filename(delta, fname, parse)
 }
 
 #' Parse items file
@@ -515,7 +597,11 @@ get_items_nb <- function(delta) {
 #' @return Character string with item name
 #' @export
 get_item_name <- function(delta, itemnum, include_comments = TRUE) {
-  delta$get_item_name(itemnum, include_comments)
+  if (isTRUE(include_comments)) {
+    delta$get_item_name_comments(itemnum, TRUE)
+  } else {
+    delta$get_item_name(itemnum)
+  }
 }
 
 #' Get number of attributes (C++ style)
@@ -553,9 +639,15 @@ get_items_filename <- function(delta) {
 #' @param delta A DeltaParser object
 #' @param fname New filename
 #' @param parse Logical, parse the file immediately
+#' @return No return value, called for side effects. The items filename stored
+#'   in \code{delta} is updated.
 #' @export
 set_items_filename <- function(delta, fname, parse = TRUE) {
-  delta$set_items_filename(fname, parse)
+  if (isTRUE(parse)) {
+    delta$set_items_filename_parse(fname, TRUE)
+  } else {
+    delta$set_items_filename(fname)
+  }
 }
 
 #------------------------------------------------------------------------------
@@ -572,7 +664,12 @@ set_items_filename <- function(delta, fname, parse = TRUE) {
 #' @return Integer item number or 0 if none
 #' @export
 first_matching <- function(delta, charnum, values, strict = TRUE, with_extrval = TRUE) {
-  delta$first_matching(charnum, as.numeric(values), strict, with_extrval)
+  v <- as.numeric(values)
+  if (isTRUE(strict) && isTRUE(with_extrval)) {
+    delta$first_matching_default(charnum, v)
+  } else {
+    delta$first_matching(charnum, v, isTRUE(strict), isTRUE(with_extrval))
+  }
 }
 
 #' Find next matching item
@@ -585,7 +682,12 @@ first_matching <- function(delta, charnum, values, strict = TRUE, with_extrval =
 #' @return Integer item number or 0 if none
 #' @export
 next_matching <- function(delta, charnum, values, strict = TRUE, with_extrval = TRUE) {
-  delta$next_matching(charnum, as.numeric(values), strict, with_extrval)
+  v <- as.numeric(values)
+  if (isTRUE(strict) && isTRUE(with_extrval)) {
+    delta$next_matching_default(charnum, v)
+  } else {
+    delta$next_matching(charnum, v, isTRUE(strict), isTRUE(with_extrval))
+  }
 }
 
 #' Check if item matches values
@@ -599,7 +701,12 @@ next_matching <- function(delta, charnum, values, strict = TRUE, with_extrval = 
 #' @return Logical indicating if item matches
 #' @export
 matches <- function(delta, itemnum, charnum, values, strict = TRUE, with_extrval = TRUE) {
-  delta$matches(itemnum, charnum, as.numeric(values), strict, with_extrval)
+  v <- as.numeric(values)
+  if (isTRUE(strict) && isTRUE(with_extrval)) {
+    delta$matches_default(itemnum, charnum, v)
+  } else {
+    delta$matches(itemnum, charnum, v, isTRUE(strict), isTRUE(with_extrval))
+  }
 }
 
 #' Find all matching items
@@ -612,7 +719,12 @@ matches <- function(delta, itemnum, charnum, values, strict = TRUE, with_extrval
 #' @return Integer vector of matching item numbers
 #' @export
 find_matching <- function(delta, charnum, values, strict = TRUE, with_extrval = TRUE) {
-  delta$find_all_matching(charnum, as.numeric(values), strict, with_extrval)
+  v <- as.numeric(values)
+  if (isTRUE(strict) && isTRUE(with_extrval)) {
+    delta$find_matching_default(charnum, v)
+  } else {
+    delta$find_matching(charnum, v, isTRUE(strict), isTRUE(with_extrval))
+  }
 }
 
 #------------------------------------------------------------------------------
@@ -651,9 +763,11 @@ is_specs_parsed <- function(delta) {
 #' @param delta A DeltaParser object
 #' @param fname New filename
 #' @param parse Logical, parse the file immediately
+#' @return No return value, called for side effects. The specifications
+#'   filename stored in \code{delta} is updated.
 #' @export
 set_specs_file <- function(delta, fname, parse = TRUE) {
-  delta$set_specs_filename(fname, parse)
+  set_specs_filename(delta, fname, parse)
 }
 
 #' Parse specifications file
@@ -673,7 +787,11 @@ parse_specs <- function(delta) {
 #' @return Integer implicit value
 #' @export
 implicit_value <- function(delta, charnum, iv_type = 1) {
-  delta$get_implicit_value(charnum, iv_type)
+  if (iv_type == 1) {
+    delta$implicit_value_default(charnum)
+  } else {
+    delta$implicit_value(charnum, iv_type)
+  }
 }
 
 #' Get all implicit values
@@ -683,7 +801,11 @@ implicit_value <- function(delta, charnum, iv_type = 1) {
 #' @return Integer vector of implicit values
 #' @export
 implicit_values <- function(delta, iv_type = 1) {
-  delta$get_all_implicit_values(iv_type)
+  if (iv_type == 1) {
+    delta$implicit_values_default()
+  } else {
+    delta$implicit_values(iv_type)
+  }
 }
 
 #' Get number of dependent characters
@@ -747,9 +869,15 @@ get_specs_filename <- function(delta) {
 #' @param delta A DeltaParser object
 #' @param fname New filename
 #' @param parse Logical, parse the file immediately
+#' @return No return value, called for side effects. The specifications
+#'   filename stored in \code{delta} is updated.
 #' @export
 set_specs_filename <- function(delta, fname, parse = TRUE) {
-  delta$set_specs_filename(fname, parse)
+  if (isTRUE(parse)) {
+    delta$set_specs_filename_parse(fname, TRUE)
+  } else {
+    delta$set_specs_filename(fname)
+  }
 }
 
 #' Get implicit value (C++ style)
@@ -760,7 +888,7 @@ set_specs_filename <- function(delta, fname, parse = TRUE) {
 #' @return Integer implicit value
 #' @export
 get_implicit_value <- function(delta, charnum, iv_type = 1) {
-  delta$get_implicit_value(charnum, iv_type)
+  implicit_value(delta, charnum, iv_type)
 }
 
 #' Get number of dependent characters (C++ style)
@@ -783,7 +911,7 @@ get_depchar_nb <- function(delta, ccnum, ccstate) {
 #' @return Integer dependent character number
 #' @export
 get_depchar <- function(delta, ccnum, ccstate, rank = 1) {
-  delta$get_depchar(ccnum, ccstate, rank)
+  delta$get_depchar(ccnum, ccstate, as.integer(rank))
 }
 
 #------------------------------------------------------------------------------
@@ -842,19 +970,22 @@ retrieve_all <- function(delta) {
 #' Parse a DELTA attribute string
 #'
 #' @param attr_string A DELTA attribute string
-#' @return A list with parsed components
+#' @return A list with parsed components: \code{charnum} (integer),
+#'   \code{comment} (character), and \code{alternatives} (list of parsed
+#'   value lists).
 #' @export
 parse_attribute <- function(attr_string) {
-  parse_delta_attribute(attr_string)
+  .parse_delta_attribute(attr_string)
 }
 
 #' Remove comments from a DELTA string
 #'
 #' @param src A string with DELTA comments
-#' @return String with all comments removed
+#' @return A character string with all DELTA comments (delimited by
+#'   \code{<} and \code{>}) removed.
 #' @export
 strip_comments <- function(src) {
-  strip_delta_comments(src)
+  .strip_delta_comments(src)
 }
 
 #' Get character type constants
@@ -862,7 +993,13 @@ strip_comments <- function(src) {
 #' @return Named integer vector of DELTA character types
 #' @export
 delta_char_types <- function() {
-  delta_char_types()
+  c(
+    unordered_multistate = 2L,
+    ordered_multistate   = 3L,
+    integer_numeric      = 4L,
+    real_numeric         = 5L,
+    text                 = 8L
+  )
 }
 
 #' Get package version

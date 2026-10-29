@@ -15,3 +15,14 @@ Integer number of characters
 \description{
 Get number of characters
 }
+\examples{
+delta <- tryCatch(
+  load_delta(
+    system.file("extdata", "chars_viola", package = "RDelta"),
+    system.file("extdata", "items_viola", package = "RDelta"),
+    system.file("extdata", "specs_viola", package = "RDelta")
+  ),
+  error = function(e) NULL
+)
+if (!is.null(delta)) char_count(delta)
+}

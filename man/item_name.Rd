@@ -19,3 +19,14 @@ Character string with item name
 \description{
 Get item name
 }
+\examples{
+delta <- tryCatch(
+  load_delta(
+    system.file("extdata", "chars_viola", package = "RDelta"),
+    system.file("extdata", "items_viola", package = "RDelta"),
+    system.file("extdata", "specs_viola", package = "RDelta")
+  ),
+  error = function(e) NULL
+)
+if (!is.null(delta)) item_name(delta, 1)
+}

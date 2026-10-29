@@ -75,15 +75,17 @@ The function assumes that the CONFOR and KEY program executables are available
 in the system PATH or in the current working directory.
 }
 \examples{
+# Requires the CONFOR and KEY executables on the PATH.
 \donttest{
-# Load a DELTA dataset
-delta <- load_delta("chars", "items", "specs")
-
-# Generate dichotomous key
-key(delta)
-
-# With custom options
-key(delta, abase = 2, rbase = 1.4,
-    no_tabular_key = TRUE, number_of_confirmatory_characters = 2)
+try({
+  delta <- load_delta(
+    system.file("extdata", "chars_viola", package = "RDelta"),
+    system.file("extdata", "items_viola", package = "RDelta"),
+    system.file("extdata", "specs_viola", package = "RDelta")
+  )
+  key(delta)
+  key(delta, abase = 2, rbase = 1.4,
+      no_tabular_key = TRUE, number_of_confirmatory_characters = 2)
+})
 }
 }

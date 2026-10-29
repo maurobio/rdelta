@@ -13,16 +13,19 @@
 #'          in the system PATH or in the current working directory.
 #'
 #' @examples
+#' # Requires the CONFOR executable on the PATH.
 #' \donttest{
-#' # Load a DELTA dataset
-#' delta <- load_delta("chars_viola", "items_viola", "specs_viola")
-#'
-#' # Check characters only
-#' checkc(delta)
+#' try({
+#'   delta <- load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   )
+#'   checkc(delta)
+#' })
 #' }
 checkc <- function(delta, remove_temp = TRUE) {
 
-  # Validate input - consistent with other RDelta functions
   if (!inherits(delta, "Rcpp_DeltaParser") && !inherits(delta, "DeltaParser")) {
     stop("'delta' must be a DeltaParser object created by load_delta()")
   }
@@ -31,12 +34,10 @@ checkc <- function(delta, remove_temp = TRUE) {
     stop("Error: Delta dataset not properly parsed")
   }
 
-  # Get file information
   chars_file <- delta$get_filename()
   has_specs <- delta$has_specifications()
   specs_file <- if (has_specs) delta$get_specs_filename() else NULL
 
-  # Work in a temporary directory so we do not write to the user's filespace
   tmp_dir <- file.path(tempdir(), paste0("RDelta_checkc_", Sys.getpid()))
   dir.create(tmp_dir, showWarnings = FALSE, recursive = TRUE)
   on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
@@ -44,30 +45,23 @@ checkc <- function(delta, remove_temp = TRUE) {
   old_wd <- setwd(tmp_dir)
   on.exit(setwd(old_wd), add = TRUE)
 
-  # --- Create CONFOR directives file ---
   directives_file <- "checkc.drt"
   con_in <- file(directives_file, "w")
 
-  # 1. SHOW directive
   cat("*SHOW Check the characters.\n", file = con_in)
   cat("\n", file = con_in)
-
-  # 2. LISTING FILE directive
   cat("*LISTING FILE checkc.lst\n", file = con_in)
   cat("\n", file = con_in)
 
-  # 3. INPUT FILE specs (if available)
   if (!is.null(specs_file) && file.exists(specs_file)) {
-    cat("*INPUT FILE ", specs_file, "\n", sep = "", file = con_in)
+    cat('*INPUT FILE "', specs_file, '"\n', sep = "", file = con_in)
     cat("\n", file = con_in)
   }
 
-  # 4. INPUT FILE chars
-  cat("*INPUT FILE ", chars_file, "\n", sep = "", file = con_in)
+  cat('*INPUT FILE "', chars_file, '"\n', sep = "", file = con_in)
 
   close(con_in)
 
-  # Run CONFOR
   if (Sys.info()["sysname"] == "Windows") {
     result <- system(paste("confor", directives_file))
   } else {
@@ -75,14 +69,13 @@ checkc <- function(delta, remove_temp = TRUE) {
     result <- system(paste(confor_cmd, directives_file))
   }
 
-  # Clean up temporary files
   if (remove_temp) {
     if (file.exists(directives_file)) unlink(directives_file)
     if (file.exists("checkc.lst")) unlink("checkc.lst")
   }
 
-  # Return 0 if successful, 1 if failed
   if (result != 0) {
+    warning("CONFOR reported an error during the check; see the listing file.")
     return(1)
   } else {
     return(0)

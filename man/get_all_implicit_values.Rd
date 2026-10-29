@@ -19,7 +19,13 @@ Get all implicit values
 }
 \examples{
 \donttest{
-delta <- load_delta("chars", "items", "specs")
-get_all_implicit_values(delta)
+try({
+  delta <- load_delta(
+    system.file("extdata", "chars_viola", package = "RDelta"),
+    system.file("extdata", "items_viola", package = "RDelta"),
+    system.file("extdata", "specs_viola", package = "RDelta")
+  )
+  get_all_implicit_values(delta)
+})
 }
 }

@@ -6,8 +6,14 @@
 #' @return Integer value or NA if not defined
 #' @examples
 #' \donttest{
-#' delta <- load_delta("chars", "items", "specs")
-#' get_implicit_value(delta, 1)
+#' try({
+#'   delta <- load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   )
+#'   get_implicit_value(delta, 1)
+#' })
 #' }
 #' @export
 get_implicit_value <- function(delta, charnum, iv_type = 1) {
@@ -21,8 +27,14 @@ get_implicit_value <- function(delta, charnum, iv_type = 1) {
 #' @return Integer vector of implicit values
 #' @examples
 #' \donttest{
-#' delta <- load_delta("chars", "items", "specs")
-#' get_all_implicit_values(delta)
+#' try({
+#'   delta <- load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   )
+#'   get_all_implicit_values(delta)
+#' })
 #' }
 #' @export
 get_all_implicit_values <- function(delta, iv_type = 1) {
@@ -37,8 +49,14 @@ get_all_implicit_values <- function(delta, iv_type = 1) {
 #' @return Number of dependent characters
 #' @examples
 #' \donttest{
-#' delta <- load_delta("chars", "items", "specs")
-#' get_depchar_nb(delta, 13, 2)
+#' try({
+#'   delta <- load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   )
+#'   get_depchar_nb(delta, 13, 2)
+#' })
 #' }
 #' @export
 get_depchar_nb <- function(delta, ccnum, ccstate) {
@@ -54,8 +72,14 @@ get_depchar_nb <- function(delta, ccnum, ccstate) {
 #' @return Dependent character number or 0 if none
 #' @examples
 #' \donttest{
-#' delta <- load_delta("chars", "items", "specs")
-#' get_depchar(delta, 13, 2, 1)
+#' try({
+#'   delta <- load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   )
+#'   get_depchar(delta, 13, 2, 1)
+#' })
 #' }
 #' @export
 get_depchar <- function(delta, ccnum, ccstate, rank = 1) {
@@ -70,8 +94,14 @@ get_depchar <- function(delta, ccnum, ccstate, rank = 1) {
 #' @return Integer vector of dependent character numbers
 #' @examples
 #' \donttest{
-#' delta <- load_delta("chars", "items", "specs")
-#' get_all_depchar(delta, 13, 2)
+#' try({
+#'   delta <- load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   )
+#'   get_all_depchar(delta, 13, 2)
+#' })
 #' }
 #' @export
 get_all_depchar <- function(delta, ccnum, ccstate) {
@@ -87,8 +117,14 @@ get_all_depchar <- function(delta, ccnum, ccstate) {
 #' @return Logical indicating if dcnum is dependent
 #' @examples
 #' \donttest{
-#' delta <- load_delta("chars", "items", "specs")
-#' is_dependent(delta, 14, 13, 2)
+#' try({
+#'   delta <- load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   )
+#'   is_dependent(delta, 14, 13, 2)
+#' })
 #' }
 #' @export
 is_dependent <- function(delta, dcnum, ccnum, ccstate) {
@@ -101,8 +137,14 @@ is_dependent <- function(delta, dcnum, ccnum, ccstate) {
 #' @return List of all dependency relationships
 #' @examples
 #' \donttest{
-#' delta <- load_delta("chars", "items", "specs")
-#' get_all_dependencies(delta)
+#' try({
+#'   delta <- load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   )
+#'   get_all_dependencies(delta)
+#' })
 #' }
 #' @export
 get_all_dependencies <- function(delta) {

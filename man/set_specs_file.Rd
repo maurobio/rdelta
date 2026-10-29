@@ -13,6 +13,10 @@ set_specs_file(delta, fname, parse = TRUE)
 
 \item{parse}{Logical, parse the file immediately}
 }
+\value{
+No return value, called for side effects. The specifications
+filename stored in \code{delta} is updated.
+}
 \description{
 Set specifications filename
 }

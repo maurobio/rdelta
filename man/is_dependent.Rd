@@ -29,7 +29,13 @@ Check if a character is dependent
 }
 \examples{
 \donttest{
-delta <- load_delta("chars", "items", "specs")
-is_dependent(delta, 14, 13, 2)
+try({
+  delta <- load_delta(
+    system.file("extdata", "chars_viola", package = "RDelta"),
+    system.file("extdata", "items_viola", package = "RDelta"),
+    system.file("extdata", "specs_viola", package = "RDelta")
+  )
+  is_dependent(delta, 14, 13, 2)
+})
 }
 }

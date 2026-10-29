@@ -5,6 +5,9 @@
 \alias{RDelta-package}
 \alias{RDelta}
 \title{RDelta: Parse and Query DELTA-Format Taxonomic Descriptions}
+\value{
+No return value; this is a package-level documentation object.
+}
 \description{
 Provides an R interface to the tDelta C++ library for parsing
 DELTA (DEscription Language for TAxonomy) format files.

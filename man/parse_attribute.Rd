@@ -10,7 +10,9 @@ parse_attribute(attr_string)
 \item{attr_string}{A DELTA attribute string}
 }
 \value{
-A list with parsed components
+A list with parsed components: \code{charnum} (integer),
+\code{comment} (character), and \code{alternatives} (list of parsed
+value lists).
 }
 \description{
 Parse a DELTA attribute string

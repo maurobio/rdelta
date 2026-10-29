@@ -30,16 +30,18 @@
 #'          in the system PATH or in the current working directory.
 #'
 #' @examples
+#' # Requires the CONFOR and KEY executables on the PATH.
 #' \donttest{
-#' # Load a DELTA dataset
-#' delta <- load_delta("chars", "items", "specs")
-#'
-#' # Generate dichotomous key
-#' key(delta)
-#'
-#' # With custom options
-#' key(delta, abase = 2, rbase = 1.4,
-#'     no_tabular_key = TRUE, number_of_confirmatory_characters = 2)
+#' try({
+#'   delta <- load_delta(
+#'     system.file("extdata", "chars_viola", package = "RDelta"),
+#'     system.file("extdata", "items_viola", package = "RDelta"),
+#'     system.file("extdata", "specs_viola", package = "RDelta")
+#'   )
+#'   key(delta)
+#'   key(delta, abase = 2, rbase = 1.4,
+#'       no_tabular_key = TRUE, number_of_confirmatory_characters = 2)
+#' })
 #' }
 key <- function(delta,
                 heading = NULL,
@@ -120,9 +122,9 @@ key <- function(delta,
   cat("*SHOW Generated on ", format(Sys.time(), "%d/%m/%Y %H:%M:%S"), "\n\n", sep = "", file = con_in)
   cat("*HEADING ", heading_text, "\n\n", sep = "", file = con_in)
 
-  # Include specifications file if it exists
+  # Include specifications file if it exists (path quoted to allow spaces)
   if (!is.null(specs_file) && file.exists(specs_file)) {
-    cat("*INPUT FILE ", specs_file, "\n\n", sep = "", file = con_in)
+    cat('*INPUT FILE "', specs_file, '"\n\n', sep = "", file = con_in)
   }
 
   # Add USE NORMAL VALUES if specified
@@ -184,9 +186,9 @@ key <- function(delta,
 
   cat("*TRANSLATE INTO KEY FORMAT\n\n", file = con_in)
   cat("*KEY OUTPUT FILE kchars\n", file = con_in)
-  cat("*INPUT FILE ", chars_file, "\n\n", sep = "", file = con_in)
+  cat('*INPUT FILE "', chars_file, '"\n\n', sep = "", file = con_in)
   cat("*KEY OUTPUT FILE kitems\n", file = con_in)
-  cat("*INPUT FILE ", items_file, "\n", sep = "", file = con_in)
+  cat('*INPUT FILE "', items_file, '"\n', sep = "", file = con_in)
 
   close(con_in)
 

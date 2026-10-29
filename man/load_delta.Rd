@@ -19,3 +19,19 @@ A DeltaParser Rcpp module object
 \description{
 Create a DeltaParser object from DELTA format files.
 }
+\examples{
+# Load the packaged example dataset
+delta <- tryCatch(
+  load_delta(
+    system.file("extdata", "chars_viola", package = "RDelta"),
+    system.file("extdata", "items_viola", package = "RDelta"),
+    system.file("extdata", "specs_viola", package = "RDelta")
+  ),
+  error = function(e) NULL
+)
+
+if (!is.null(delta)) {
+  char_count(delta)
+  char_feature(delta, 1)
+}
+}
