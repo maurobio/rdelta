@@ -10,13 +10,13 @@ Provides an R interface to the 'tDelta' C++ library for parsing     'DELTA' (***
 
 Installing from CRAN:
 
-```
+```R
 install.packages("RDelta")`
 ```
 
 Installing from GitHub:
 
-```
+```R
 install.packages("devtools")
 library(devtools)
 devtools::install_github("maurobio/rdelta")
@@ -28,14 +28,14 @@ Some of the package functions assumes that the DELTA system CONFOR, KEY, or DIST
 
 #### Load a DELTA dataset:
 
-```
+```R
 library(RDelta)
 delta <- load_delta("chars", "items", "specs")
 ```
 
 #### List characters:
 
-```
+```R
 cat("\nCHARACTERS LIST:\n")
 for (i in 1:Example$get_chars_nb()) {
 	cat(i, " : ", Example$get_char_feature(i), "\n")
@@ -45,7 +45,7 @@ cat("* ", Example$get_chars_nb(), " characters *\n")
 
 #### List items:
 
-```
+```R
 cat("\nITEMS LIST:\n")
 for (i in 1:Example$get_items_nb()) {
 	cat(i, " : ", Example$get_item_name(i), "\n")
@@ -55,12 +55,12 @@ cat("* ", Example$get_items_nb(), " items *\n")
 
 #### Create a dichotomous key (with default parameters):
 
-```
+```R
 key(delta)`
 ```
 
 #### Create a natural-language description:
 
-```
+```R
 natlan(delta)`
 ```
