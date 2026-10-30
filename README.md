@@ -16,7 +16,7 @@ Installing from GitHub:
 
 `install.packages("devtools")`
 `library(devtools)`
-devtools::install_github("maurobio/rdelta")
+`devtools::install_github("maurobio/rdelta")
 
 Some of the package functions assumes that the DELTA system CONFOR, KEY, or DIST program executables are available in the system PATH or in the current working directory. Get these programs from here: https://github.com/maurobio/freedelta/tree/main/classic_delta
 
