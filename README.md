@@ -56,11 +56,11 @@ cat("* ", Example$get_items_nb(), " items *\n")
 #### Create a dichotomous key (with default parameters):
 
 ```R
-key(delta)`
+key(delta)
 ```
 
 #### Create a natural-language description:
 
 ```R
-natlan(delta)`
+natlan(delta)
 ```
