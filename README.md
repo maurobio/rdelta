@@ -28,6 +28,7 @@ Some of the package functions assumes that the DELTA system CONFOR, KEY, or DIST
 
 #### Load a DELTA dataset:
 
+```
 library(RDelta)
 delta <- load_delta("chars", "items", "specs")
 ```
@@ -54,9 +55,12 @@ cat("* ", Example$get_items_nb(), " items *\n")
 
 #### Create a dichotomous key (with default parameters):
 
-`key(delta)`
+```
+key(delta)`
+```
 
 #### Create a natural-language description:
 
-`natlan(delta)`
+```
+natlan(delta)`
 ```
