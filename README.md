@@ -10,7 +10,9 @@ Provides an R interface to the 'tDelta' C++ library for parsing     'DELTA' (***
 
 Installing from CRAN:
 
-`install.packages("RDelta")`
+```
+install.packages("RDelta")`
+```
 
 Installing from GitHub:
 
