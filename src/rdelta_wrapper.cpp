@@ -660,8 +660,7 @@ public:
         if (dep_count > 0) {
           IntegerVector deps = get_all_depchar(ccnum, ccstate);
           if (deps.size() > 0) {
-            CharacterVector key(1);
-            key[0] = std::to_string(ccnum) + "," + std::to_string(ccstate);
+            std::string key = std::to_string(ccnum) + "," + std::to_string(ccstate);
             result[key] = deps;
           }
         }
